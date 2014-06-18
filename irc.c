@@ -17,9 +17,9 @@ typedef struct Config Config;
 struct Config {
 	char *host;
 	int port;
-	char *name;
-	char *chan;
-	char *qmsg;
+	char name[MAX_NICK_LEN];
+	char chan[MAX_CHAN_LEN];
+	char qmsg[MAX_MSG_LEN];
 } conf = {
 	"irc.installgentoo.com",
 	6667,
@@ -39,6 +39,7 @@ irc_connect(void)
 	printf("Connecting to %s...\n", conf.host);
 	serv = gethostbyname(conf.host);
 	addr.sin_family = AF_INET;
+	memcpy(&addr.sin_addr.s_addr, serv->h_addr, serv->h_length);
 	addr.sin_port = htons(conf.port);
 	if(connect(fd, (struct sockaddr *) &addr, sizeof(addr))<0) {
 		puts("Connection error");
