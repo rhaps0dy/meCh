@@ -8,8 +8,8 @@ MODDIR = mod
 _MODOBJ = test.o
 MODOBJ = $(patsubst %,$(MODDIR)/%,$(_MODOBJ))
 
-DEPS = irc.h config.h module.h
-OBJ = irc.o config.o module.o
+DEPS = irc.h config.h module.h utils.h
+OBJ = irc.o config.o module.o utils.o
 MAIN = main.o
 
 

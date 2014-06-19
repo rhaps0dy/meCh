@@ -1,12 +1,12 @@
 #include "irc.h"
 #include "config.h"
 #include "module.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <string.h>
 
 static Module mod;
-static char *mod_name = "Help";
 static char mod_help[80];
 
 static void
@@ -16,16 +16,17 @@ help(Module *m, char *nick, char *msg, int type)
 	unsigned int i, j;
 
 	if(type == T_CHAN) msg++; /* avoid the . */
-	if(strcmp(msg, "help")) return;
+	if(!strbeg(msg, "help")) return;
 	do {
 		for(i=0; i<IRC_MSG_LEN && (buf[i]=m->name[i]); i++);
 		buf[i] = ':';
 		i++;
 		buf[i] = ' ';
 		i++;
-		for(j=0; j+i<IRC_MSG_LEN && (buf[j+i]=m->help[j]); j++);
-		buf[j+i] = '\n';
-		buf[j+i+1] = '\0';
+		j=0;
+		if(m->help)
+			for(; j+i<IRC_MSG_LEN && (buf[j+i]=m->help[j]); j++);
+		buf[j+i] = '\0';
 		irc_msg(nick, buf);
 		m = m->next;
 	} while(m);
@@ -35,7 +36,7 @@ void mod_add(Module *m)
 {
 	m->next = mod.next;
 	mod.next = m;
-	printf("Added module %s", m->name);
+	printf("Added module %s\n", m->name);
 }
 
 void
@@ -64,7 +65,7 @@ mod_handle(char *msg)
 void
 mod_init(void)
 {
-	mod.name = mod_name;
+	mod.name = "Help";
 	mod.help = mod_help;
 	mod.f    = help;
 	mod.s    = 0;

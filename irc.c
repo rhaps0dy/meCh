@@ -1,5 +1,6 @@
 #include "irc.h"
 #include "config.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,12 +66,13 @@ irc_connect(void)
 static void
 close_msg(char *buf, char *msg, unsigned int i) {
 	unsigned int j;
-	i++; buf[i] = ' ';
+	buf[i] = ' ';
 	i++; buf[i] = ':';
 	for(j=0, i++; j<IRC_MSG_LEN && msg[j]!='\0'; j++, i++)
 		buf[i] = msg[j];
 	i++; buf[i] = '\n';
 	i++; buf[i] = '\0';
+	puts(buf);
 	write(fd, buf, i);
 }
 
@@ -151,9 +153,9 @@ irc_get_type(char *msg)
 		if(msg[i]=='\0') return T_OTHER;
 		if(msg[i]==' ') break;
 	}
-
-	if(!strcmp(msg+i, "JOIN")) return T_JOIN;
-	if(!strcmp(msg+i, "PRIVMSG")) {
+	i++;
+	if(strbeg(msg+i, "JOIN")) return T_JOIN;
+	if(strbeg(msg+i, "PRIVMSG")) {
 		if(msg[i+8]==conf.chan[0]) return T_CHAN;
 		return T_MSG;
 	}
@@ -165,11 +167,15 @@ irc_get_text(char *txt, char *msg)
 {
 	int i;
 
-	for(i=0; ; i++) {
-		if(i>=IRC_MSG_LEN) return;
-		if(msg[i]=='\0') return;
+	for(i=1; ; i++) {
+		if(i>=IRC_MSG_LEN) goto err;
+		if(msg[i]=='\0') goto err;
 		if(msg[i]==':') break;
 	}
 	i++;
 	strcpy(txt, msg+i);
+	return;
+err:
+	txt[0] = '\0';
+	return;
 }
