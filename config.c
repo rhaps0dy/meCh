@@ -5,6 +5,7 @@ Config conf = {
 	"irc.installgentoo.com",
 	6667,
 	"meCh",
-	"#test",
-	"baka baka"
+	"#2d",
+	"I'll be taking my leave then. Goodbye",
+	"rhaps0dy"
 };

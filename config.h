@@ -9,6 +9,7 @@ struct Config {
 	char name[IRC_NICK_LEN];
 	char chan[IRC_CHAN_LEN];
 	char qmsg[IRC_MSG_LEN];
+	char owner[IRC_NICK_LEN];
 };
 
 extern Config conf;

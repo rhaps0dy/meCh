@@ -75,5 +75,6 @@ mod_init(void)
 	sprintf(mod_help, "\"/msg %s help\" or \".help\" to read this help.", conf.name);
 
 	/* Register modules here */
-	mod_test();
+	mod_utopia();
+	mod_tell();
 }

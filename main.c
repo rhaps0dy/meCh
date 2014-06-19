@@ -1,20 +1,21 @@
 #include "irc.h"
 #include "module.h"
 
-#include <stdlib.h>
+#include <signal.h>
+#include <stdio.h>
+
+void handle_SIGINT(int sig)
+{
+	puts("Exiting...");
+	irc_quit();
+}
 
 int
 main()
 {
-	char buf[128];
-
 	irc_connect();
+	signal(SIGINT, handle_SIGINT);
 	mod_init();
-	while(1) {
-		irc_read(buf);
-		if(buf[0]=='Q' && buf[1]=='U') break;
-		mod_handle(buf);
-	}
-	irc_quit();
-	return EXIT_FAILURE; /* not reachable */
+	irc_loop();
+	return 1; /* not reachable */
 }

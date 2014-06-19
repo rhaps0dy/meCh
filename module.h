@@ -14,5 +14,8 @@ void mod_init(void);
 void mod_add(Module *m);
 /* Make the module chain handle a message */
 void mod_handle(char *msg);
+
 /* Register modules here */
 void mod_test(void);
+void mod_utopia(void);
+void mod_tell(void);

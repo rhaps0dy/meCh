@@ -1,6 +1,7 @@
 #include "irc.h"
 #include "config.h"
 #include "utils.h"
+#include "module.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +16,21 @@
 #include <errno.h>
 
 static int fd;
+
+void
+irc_loop(void)
+{
+	char buf[IRC_MSG_LEN];
+	while(1) {
+		irc_read(buf);
+		if(strbeg(buf, "PING")) {
+			buf[1] = 'O';
+			irc_cmd(buf);
+		}
+		else
+			mod_handle(buf);
+	}
+}
 
 void
 irc_connect(void)
@@ -61,6 +77,9 @@ irc_connect(void)
 	strcat(buf, "\n");
 	irc_cmd(buf);
 	puts("Connected!");
+	sprintf(buf, "Hello, I'm %s!", conf.name);
+	irc_say(buf);
+	while(irc_read(buf) && irc_get_type(buf)!=T_JOIN);
 }
 
 static void
@@ -72,7 +91,6 @@ close_msg(char *buf, char *msg, unsigned int i) {
 		buf[i] = msg[j];
 	i++; buf[i] = '\n';
 	i++; buf[i] = '\0';
-	puts(buf);
 	write(fd, buf, i);
 }
 
@@ -101,7 +119,10 @@ irc_msg(char *nick, char *msg)
 void
 irc_cmd(char *msg)
 {
-	write(fd, msg, strlen(msg));
+	int i;
+	for(i=0; msg[i]; i++);
+	msg[i] = '\n';
+	write(fd, msg, i+1);
 }
 
 unsigned int

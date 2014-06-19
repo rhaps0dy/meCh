@@ -16,6 +16,9 @@ enum irc_type {
  * configured channel with the configured name */
 void irc_connect(void);
 
+/* the main loop that processes input from the server */
+void irc_loop(void);
+
 /* msg and nick must be null-terminated */
 /* says this to the channel */
 void irc_say(char *msg);
