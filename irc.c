@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include <sys/socket.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -19,7 +20,7 @@ irc_connect(void)
 {
 	struct sockaddr_in addr;
 	struct hostent *serv;
-	char buf[128];
+	char buf[IRC_MSG_LEN];
 
 	fd = socket(AF_INET, SOCK_STREAM/*|SOCK_NONBLOCK*/, 0);
 	printf("Connecting to %s...\n", conf.host);
@@ -31,8 +32,8 @@ irc_connect(void)
 		puts("Connection error");
 		exit(EXIT_FAILURE);
 	}
-	irc_read(buf, 128);
-	irc_read(buf, 128);
+	irc_read(buf);
+	irc_read(buf);
 	strcpy(buf, "USER ");
 	strcat(buf, conf.name);
 	strcat(buf, " ");
@@ -42,22 +43,22 @@ irc_connect(void)
 	strcat(buf, " ");
 	strcat(buf, conf.name);
 	strcat(buf, "\n");
-	irc_send(buf);
+	irc_cmd(buf);
 	strcpy(buf, "NICK ");
 	strcat(buf, conf.name);
 	strcat(buf, "\n");
-	irc_send(buf);
-	irc_read(buf, 128);
+	irc_cmd(buf);
+	irc_read(buf);
 	buf[1] = 'O';
-	irc_send(buf);
-	while(irc_read(buf, 128)) {
+	irc_cmd(buf);
+	while(irc_read(buf)) {
 		buf[strlen(conf.name)+1] = '\0';
 		if(!strcmp(buf+1, conf.name)) break;
 	}
 	strcpy(buf, "JOIN ");
 	strcat(buf, conf.chan);
 	strcat(buf, "\n");
-	irc_send(buf);
+	irc_cmd(buf);
 	puts("Connected!");
 }
 
@@ -121,7 +122,7 @@ irc_quit(void)
 	char buf[128] = "QUIT :";
 	strcat(buf, conf.qmsg);
 	strcat(buf, "\n");
-	irc_send(buf);
+	irc_cmd(buf);
 	exit(EXIT_SUCCESS);
 }
 

@@ -1,4 +1,7 @@
+#include "irc.h"
+#include "config.h"
 #include "module.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -39,15 +42,21 @@ void
 mod_handle(char *msg)
 {
 	Module *m;
-	int type;
 	char nick[IRC_NICK_LEN];
-	char cmd[IRC_NICK_LEN];
-	irc_get_nick(nick, msg);
-	irc_get_nick(nick, msg);
+	char txt[IRC_MSG_LEN];
+	enum irc_type type;
+
+	type = irc_get_type(msg);
+	if(type!=T_OTHER)
+		irc_get_nick(nick, msg);
+	irc_get_text(txt, msg);
+	/* mark message as copied */
+	msg[0] = '\0';
 
 	m = &mod;
 	do {
-		m->f(m, msg);
+		if(m->on & type)
+			m->f(m, nick, txt, type);
 		m = m->next;
 	} while(m);
 }
@@ -59,10 +68,10 @@ mod_init(void)
 	mod.help = mod_help;
 	mod.f    = help;
 	mod.s    = 0;
-	mod.on   = T_PRIVMSG | T_CHANMSG;
+	mod.on   = T_MSG | T_CHAN;
 	mod.next = 0;
 
-	sprintf(mod_help, "\"/msg %s help\" or \".help\" to read this help.");
+	sprintf(mod_help, "\"/msg %s help\" or \".help\" to read this help.", conf.name);
 
 	/* Register modules here */
 	mod_test();
