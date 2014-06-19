@@ -3,7 +3,6 @@ struct Module {
 	char *name;                            /* module name */
 	char *help;                            /* help text */
 	void (*f)(Module*, char*, char*, int); /* module function */
-	void *s;                               /* state, size is defined in the module */
 	int on;                                /* when is the module executed */
 	Module *next;                          /* next module in the linked list */
 };

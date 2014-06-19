@@ -68,7 +68,6 @@ mod_init(void)
 	mod.name = "Help";
 	mod.help = mod_help;
 	mod.f    = help;
-	mod.s    = 0;
 	mod.on   = T_MSG | T_CHAN;
 	mod.next = 0;
 

@@ -24,7 +24,6 @@ mod_utopia(void)
 	utopia.help = "my channel is a socialist utopia. Don't be a meanie!";
 	utopia.next = 0;
 	utopia.f = give_op;
-	utopia.s = 0;
 	utopia.on = T_JOIN;
 	mod_add(&utopia);
 }

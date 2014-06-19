@@ -16,7 +16,6 @@ mod_test(void)
 	test.help = "this module repeats all that is said!";
 	test.next = 0;
 	test.f = mirror_msg;
-	test.s = 0;
 	test.on = T_CHAN;
 	mod_add(&test);
 }
