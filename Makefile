@@ -5,7 +5,7 @@ LDFLAGS=
 LIBS=
 
 MODDIR = mod
-_MODOBJ = test.o utopia.o tell.o
+_MODOBJ = test.o utopia.o tell.o fortune.o
 MODOBJ = $(patsubst %,$(MODDIR)/%,$(_MODOBJ))
 
 DEPS = irc.h config.h module.h utils.h

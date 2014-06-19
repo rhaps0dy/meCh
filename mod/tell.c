@@ -30,11 +30,11 @@ add_msg(char *sender, char *msg, char private)
 
 	new = (TellMsg *) malloc(sizeof(TellMsg));
 	strcpy(new->sender, sender);
-	for(; *msg!=' ' && *msg; msg++);
+	for(; *msg && *msg!=' '; msg++);
 	msg++;
-	for(i=0; i<IRC_NICK_LEN-1 && (new->name[i]=msg[i])!=' ' && msg[i]; i++);
+	for(i=0; i<IRC_NICK_LEN-1 && msg[i] && (new->name[i]=msg[i])!=' '; i++);
 	new->name[i] = '\0';
-	strcpy(new->msg, msg+i+1);
+	strcpy(new->msg, msg+i);
 	new->private = private;
 	new->next = base.next;
 	base.next = new;
@@ -69,7 +69,7 @@ do_tell(Module *m, char *nick, char *msg, int type)
 		buf[0] = '(';
 		buf[1] = '\0';
 		strcat(buf, tmsg->sender);
-		strcat(buf, ") ");
+		strcat(buf, ")");
 		strcat_msg(buf, tmsg->msg);
 		if(tmsg->private)
 			irc_msg(nick, buf);
