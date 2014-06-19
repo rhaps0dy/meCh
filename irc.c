@@ -75,34 +75,51 @@ irc_connect(void)
 	puts("Connected!");
 }
 
-void
-irc_send(char *msg)
-{
-	write(fd, msg, strlen(msg));
+static void
+close_msg(char *buf, char *msg, unsigned int i) {
+	unsigned int j;
+	i++; buf[i] = ' ';
+	i++; buf[i] = ':';
+	for(j=0, i++; j<IRC_MSG_LEN && msg[j]!='\0'; j++, i++)
+		buf[i] = msg[j];
+	i++; buf[i] = '\n';
+	i++; buf[i] = '\0';
+	write(fd, buf, i);
 }
 
 void
-irc_msg(char *msg)
+irc_say(char *msg)
 {
-	char buf[1024] = "PRIVMSG ";
-	strcat(buf, conf.chan);
-	strcat(buf, " :");
-	strcat(buf, msg);
-	strcat(buf, "\n");
-	write(fd, buf, strlen(buf));
+	char buf[IRC_MSG_LEN+IRC_CHAN_LEN+12] = "PRIVMSG ";
+	unsigned int i, j;
+
+	for(j=0, i=8; j<IRC_CHAN_LEN && conf.chan[j]!='\0'; j++, i++)
+		buf[i] = conf.chan[j];
+	close_msg(buf, msg, i);
+}
+
+void
+irc_msg(char *nick, char *msg)
+{
+	char buf[IRC_MSG_LEN+IRC_NICK_LEN+12] = "PRIVMSG ";
+	unsigned int i, j;
+
+	for(j=0, i=8; j<IRC_NICK_LEN && nick[j]!='\0'; j++, i++)
+		buf[i] = nick[j];
+	close_msg(buf, msg, i);
 }
 
 unsigned int
-irc_read(char *msg, unsigned int sz)
+irc_read(char *msg)
 {
 	unsigned int i;
 
-	for(i=0; i<sz-1; i++)
+	for(i=0; i<IRC_MSG_LEN-1; i++)
 		if(!read(fd, msg+i, 1) || msg[i]=='\n')
 			break;
 	msg[i] = '\0';
-	if(i==sz-1)
-		return sz;
+	if(i==IRC_MSG_LEN-1) /* we didn't read a whole line */
+		return IRC_MSG_LEN;
 	return i;
 }
 
@@ -115,6 +132,55 @@ irc_quit(void)
 	irc_send(buf);
 	exit(EXIT_SUCCESS);
 }
+
+void
+irc_get_nick(char *nick, char *msg)
+{
+	unsigned int i;
+
+	if(msg[0]!=':' || msg[0]=='\0') {
+		nick[0] = '\0';
+		return;
+	}
+	msg++;
+	for(i=0; i<IRC_NICK_LEN && *msg!='\0' && *msg!='!'; i++, msg++)
+		nick[i] = *msg;
+	nick[i] = '\0';
+}
+
+enum irc_type
+irc_get_type(char *msg)
+{
+	unsigned int i;
+
+	for(i=0; ; i++) {
+		if(i>=IRC_MSG_LEN) return T_OTHER;
+		if(msg[i]=='\0') return T_OTHER;
+		if(msg[i]==' ') break;
+	}
+
+	if(!strcmp(msg+i, "JOIN")) return T_JOIN;
+	if(!strcmp(msg+i, "PRIVMSG")) {
+		if(msg[i+8]==conf.chan[0]) return T_CHAN;
+		return T_MSG;
+	}
+	return T_OTHER;
+}
+
+void
+irc_get_text(char *txt, char *msg)
+{
+	int i;
+
+	for(i=0; ; i++) {
+		if(i>=IRC_MSG_LEN) return;
+		if(msg[i]=='\0') return;
+		if(msg[i]==':') break;
+	}
+	i++;
+	strcpy(txt, msg+i);
+}
+
 
 int
 main()
