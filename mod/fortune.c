@@ -18,28 +18,38 @@ static void
 do_fortune(Module *m, char *nick, char *msg, int type)
 {
 	int fd[2];
-	int status;
+	int status, i, j;
 	char buf[IRC_MSG_LEN];
 
 	if(type==T_CHAN) msg++;
 	if(!strbeg(msg, "fortune")) return;
 	pipe(fd);
 	if(!fork()) {
-		dup2(1, fd[1]);
+		dup2(fd[1], 1);
 		close(fd[0]);
 		execlp("fortune", "fortune", NULL);
 	}
 	close(fd[1]);
 	wait(&status);
-	status = read(fd[0], buf, IRC_MSG_LEN);
-	buf[status] = '\0';
-	switch(type) {
-	case T_CHAN:
-		irc_say(buf);
-		break;
-	case T_MSG:
-		irc_msg(nick, buf);
-		break;
+	i = read(fd[0], buf, IRC_MSG_LEN);
+	buf[i] = '\0';
+
+	for(i=0; buf[i]; i++) {
+		j=i;
+		for(; buf[i] && buf[i]!='\n'; i++)
+			if(buf[i]=='\t')
+				buf[i] = ' ';
+		if(buf[i]) buf[i] = '\0';
+		else return;
+
+		switch(type) {
+		case T_CHAN:
+			irc_say(buf+j);
+			break;
+		case T_MSG:
+			irc_msg(nick, buf+j);
+			break;
+		}
 	}
 }
 
