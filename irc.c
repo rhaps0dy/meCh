@@ -1,4 +1,5 @@
 #include "irc.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,21 +13,6 @@
 #include <errno.h>
 
 static int fd;
-
-typedef struct Config Config;
-struct Config {
-	char *host;
-	int port;
-	char name[MAX_NICK_LEN];
-	char chan[MAX_CHAN_LEN];
-	char qmsg[MAX_MSG_LEN];
-} conf = {
-	"irc.installgentoo.com",
-	6667,
-	"meCh",
-	"#test",
-	"baka baka"
-};
 
 void
 irc_connect(void)
@@ -109,6 +95,12 @@ irc_msg(char *nick, char *msg)
 	close_msg(buf, msg, i);
 }
 
+void
+irc_cmd(char *msg)
+{
+	write(fd, msg, strlen(msg));
+}
+
 unsigned int
 irc_read(char *msg)
 {
@@ -179,21 +171,4 @@ irc_get_text(char *txt, char *msg)
 	}
 	i++;
 	strcpy(txt, msg+i);
-}
-
-
-int
-main()
-{
-	char buf[128];
-
-	irc_connect();
-	mod_init();
-	while(1) {
-		irc_read(buf, 128);
-		if(buf[0]=='Q' && buf[1]=='U') break;
-		mod_handle(buf);
-	}
-	irc_quit();
-	return EXIT_FAILURE; /* not reachable */
 }

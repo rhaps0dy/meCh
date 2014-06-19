@@ -4,9 +4,10 @@
 static Module test;
 
 static void
-mirror_msg(Module *m, char *msg)
+mirror_msg(Module *m, char *nick, char *msg, int type)
 {
-	irc_msg(msg);
+	if(type==T_CHAN)
+		irc_say(msg);
 }
 
 void
