@@ -29,12 +29,12 @@ add_msg(char *sender, char *msg, char private)
 	unsigned int i;
 
 	new = (TellMsg *) malloc(sizeof(TellMsg));
-	strcpy(new->msg, msg);
 	strcpy(new->sender, sender);
 	for(; *msg!=' ' && *msg; msg++);
 	msg++;
 	for(i=0; i<IRC_NICK_LEN-1 && (new->name[i]=msg[i])!=' ' && msg[i]; i++);
 	new->name[i] = '\0';
+	strcpy(new->msg, msg+i+1);
 	new->private = private;
 	new->next = base.next;
 	base.next = new;
