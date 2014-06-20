@@ -21,7 +21,7 @@ do_fortune(Module *m, char *nick, char *msg, int type)
 	int status, i, j;
 	char buf[IRC_MSG_LEN];
 
-	if(type==T_CHAN) msg++;
+	if(type==T_CHAN && msg[0]=='.') msg++;
 	if(!strbeg(msg, "fortune")) return;
 	pipe(fd);
 	if(!fork()) {

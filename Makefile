@@ -2,10 +2,10 @@ NAME=meCh
 CC=gcc
 CFLAGS=-O3 -Wall -Werror -pedantic -g
 LDFLAGS=
-LIBS=
+LIBS=-lm
 
 MODDIR = mod
-_MODOBJ = test.o utopia.o tell.o fortune.o
+_MODOBJ = test.o utopia.o tell.o fortune.o seen.o
 MODOBJ = $(patsubst %,$(MODDIR)/%,$(_MODOBJ))
 
 DEPS = irc.h config.h module.h utils.h

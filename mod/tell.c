@@ -9,6 +9,7 @@
 
 static Module tell;
 static char tell_help[IRC_MSG_LEN];
+static char* usage = "Usage: .tell <nick> <message>";
 
 /* We'll use a linked list for storing messages. O(n) is okay */
 typedef struct TellMsg TellMsg;
@@ -20,9 +21,9 @@ struct TellMsg {
 	TellMsg *next;
 };
 
-static TellMsg base = {"", "", "", 0, 0};
+static TellMsg base = {"", "", "", 0, NULL};
 
-static void
+static int
 add_msg(char *sender, char *msg, char private)
 {
 	TellMsg *new;
@@ -31,14 +32,19 @@ add_msg(char *sender, char *msg, char private)
 	new = (TellMsg *) malloc(sizeof(TellMsg));
 	strcpy(new->sender, sender);
 	for(; *msg && *msg!=' '; msg++);
+	if(!*msg) goto err;
 	msg++;
 	for(i=0; i<IRC_NICK_LEN-1 && msg[i] && (new->name[i]=msg[i])!=' '; i++);
+	if(i==0 || !msg[i]) goto err;
 	new->name[i] = '\0';
 	strcpy(new->msg, msg+i);
 	new->private = private;
 	new->next = base.next;
 	base.next = new;
-	printf("Sender: %s, receiver: %s, message: %s\n", new->sender, new->name, new->msg);
+	return 0;
+err:
+	free(new);
+	return 1;
 }
 
 static TellMsg *
@@ -82,19 +88,25 @@ do_tell(Module *m, char *nick, char *msg, int type)
 		free(tmsg);
 	}
 
-	if(type==T_CHAN) msg++;
+	if(type==T_CHAN && msg[0]=='.') msg++;
 	if(!strbeg(msg, "tell")) return;
 	switch(type) {
 	case T_CHAN:
-		add_msg(nick, msg, 0);
+		if(add_msg(nick, msg, 0)) {
+			irc_say(usage);
+			return;
+		}
 		sprintf(buf, "I'll pass your message to %s.", base.next->name);
 		irc_say(buf);
-		break;
+		return;
 	case T_MSG:
-		add_msg(nick, msg, 1);
+		if(add_msg(nick, msg, 1)) {
+			irc_msg(nick, usage);
+			return;
+		}
 		sprintf(buf, "I'll pass your message to %s privately.", base.next->name);
 		irc_msg(nick, buf);
-		break;
+		return;
 	}
 }
 
@@ -105,7 +117,7 @@ mod_tell(void)
 	tell.help = tell_help;
 	sprintf(tell_help, "\".tell <nick> <message>\" to leave a public message for someone. "
 		"\"/msg %s tell <nick> <message>\" will privately send the message to that nick when they "
-		"say something in the channel or to %s", conf.name, conf.name);
+		"say something in the channel or to me.", conf.name);
 	tell.next = 0;
 	tell.f = do_tell;
 	tell.on = T_JOIN|T_CHAN|T_MSG;

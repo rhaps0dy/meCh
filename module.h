@@ -19,3 +19,4 @@ void mod_test(void);
 void mod_utopia(void);
 void mod_tell(void);
 void mod_fortune(void);
+void mod_seen(void);

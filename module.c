@@ -77,4 +77,5 @@ mod_init(void)
 	mod_utopia();
 	mod_tell();
 	mod_fortune();
+	mod_seen();
 }
