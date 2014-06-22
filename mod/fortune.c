@@ -47,6 +47,8 @@ do_fortune(Module *m, char **args, enum irc_type type)
 		for(; buf[i] && buf[i]!='\n'; i++)
 			if(buf[i]=='\t')
 				buf[i] = ' ';
+			else if(buf[i]=='\n')
+				buf[i] = ' ';
 		if(buf[i]) buf[i] = '\0';
 		else return;
 
