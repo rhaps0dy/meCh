@@ -2,6 +2,17 @@
 "irc.h"
 */
 
+
+/*Module
+modules should use exactly the number of arguments they list in nargs.
+If they want to use the invokers, they should have nargs>=3.
+invokers are strings that make the module be ran, if they are typed as
+/msg <conf.name> <invoker> or <conf.cmd><invoker>. The invokers array
+must finish with a NULL, if the NULL is the only value in it the module
+is ran always.
+you can use $<number> in the help to insert
+["/msg <conf.name> <invoker>" | "<conf.cmd><invoker>"] in the help text.
+To print "$" use "$$"*/
 typedef struct Module Module;
 struct Module {
 	char *name;         /* module name */
