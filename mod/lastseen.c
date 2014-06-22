@@ -51,8 +51,6 @@ do_seen(Module *m, char **args, enum irc_type type)
 {
 	LastSeen *l;
 
-	printf("'%s' '%s'\n", args[0], args[1]);
-
 	l = ls_find(args[0]);
 	if(!l) l = ls_new(args[0]);
 	strcpy(l->msg, args[1]);

@@ -99,7 +99,7 @@ void
 mod_handle(char *msg)
 {
 	Module *m;
-	int i, nargs=2, callmod;
+	int i, nargs = 2, call_module;
 	unsigned int txtlen, actlen;
 	char nick[IRC_NICK_LEN];
 	char txt[IRC_MSG_LEN];
@@ -117,14 +117,13 @@ mod_handle(char *msg)
 	args[0] = nick;
 	/* this piece works because nargsrec is >=3 always.
 	 * If it was <=2 it should be checked and accounted for*/
-	args[1] = strtok(txt, " ");
 	txtlen = strlen(txt);
+	args[1] = strtok(txt, " ");
 	for(i=2; i<nargsrec; i++) {
 		args[i] = strtok(NULL, " ");
 		spaces[i-2] = args[i-1]+strlen(args[i-1]);
 		if(!args[i]) {
 			args[i] = args[1]+txtlen;
-			spaces[i-2] = args[i];
 			break;
 		}
 	}
@@ -134,7 +133,7 @@ mod_handle(char *msg)
 	nargs = i;
 	for(; i<nargsrec; i++) {
 		args[i] = args[nargs];
-		spaces[i-2] = args[nargs];
+		spaces[i-2] = NULL;
 	}
 
 	/*printf("nargs: %d, nargsrec: %d\n", nargs, nargsrec);
@@ -145,24 +144,24 @@ mod_handle(char *msg)
 
 	m = &mod;
 	do {
-		callmod = 0;
+		call_module = 0;
 		if(m->on & type) {
 			if(!m->invokers[0])
-				callmod = 1;
+				call_module = 1;
 			for(i=0; m->invokers[i]; i++)
 				if(type==T_CHAN) {
 					if(args[1][0]==conf.cmd && !strcmp(args[1]+1, m->invokers[i]))
-						callmod = 1;
+						call_module = 1;
 				} else {
 					if(!strcmp(args[1], m->invokers[i]))
-						callmod = 1;
+						call_module = 1;
 				}
 		}
 
-		if(callmod) {
+		if(call_module) {
 			for(i=0; i<nargs-2 && i<m->nargs-2; i++)
 				*spaces[i] = '\0';
-			for(; i<nargs-2 && i<nargsrec-2; i++)
+			for(; i<nargs-2; i++)
 				*spaces[i] = ' ';
 			/*printf("Module %s\n", m->name);
 			for(i=0; i<m->nargs; i++)

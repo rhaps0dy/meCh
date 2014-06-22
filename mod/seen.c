@@ -46,8 +46,6 @@ tell_seen(Module *m, char **args, enum irc_type type)
 	LastSeen *l;
 	char buf[IRC_MSG_LEN];
 
-	printf("seen: '%s' '%s' '%s' '%s'\n", args[0], args[1], args[2], args[3]);
-
 	l = ls_find(args[2]);
 	if(!l) {
 		sprintf(buf, "Sorry, %s is not in the records.", args[2]);
