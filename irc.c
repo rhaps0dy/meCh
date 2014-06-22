@@ -59,11 +59,11 @@ irc_connect(void)
 	strcat(buf, conf.name);
 	strcat(buf, " ");
 	strcat(buf, conf.name);
-	strcat(buf, "\n");
+	strcat(buf, "\r\n");
 	irc_cmd(buf);
 	strcpy(buf, "NICK ");
 	strcat(buf, conf.name);
-	strcat(buf, "\n");
+	strcat(buf, "\r\n");
 	irc_cmd(buf);
 	irc_read(buf);
 	buf[1] = 'O';
@@ -74,7 +74,7 @@ irc_connect(void)
 	}
 	strcpy(buf, "JOIN ");
 	strcat(buf, conf.chan);
-	strcat(buf, "\n");
+	strcat(buf, "\r\n");
 	irc_cmd(buf);
 	puts("Connected!");
 	sprintf(buf, "Hello, I'm %s!", conf.name);
@@ -89,6 +89,7 @@ close_msg(char *buf, char *msg, unsigned int i) {
 	i++; buf[i] = ':';
 	for(j=0, i++; j<IRC_MSG_LEN && msg[j]!='\0'; j++, i++)
 		buf[i] = msg[j];
+	i++; buf[i] = '\r';
 	i++; buf[i] = '\n';
 	i++; buf[i] = '\0';
 	write(fd, buf, i);
@@ -97,7 +98,7 @@ close_msg(char *buf, char *msg, unsigned int i) {
 void
 irc_say(char *msg)
 {
-	char buf[IRC_MSG_LEN+IRC_CHAN_LEN+12] = "PRIVMSG ";
+	char buf[IRC_MSG_LEN+IRC_CHAN_LEN+13] = "PRIVMSG ";
 	unsigned int i, j;
 
 	for(j=0, i=8; j<IRC_CHAN_LEN && conf.chan[j]!='\0'; j++, i++)
@@ -108,7 +109,7 @@ irc_say(char *msg)
 void
 irc_msg(char *nick, char *msg)
 {
-	char buf[IRC_MSG_LEN+IRC_NICK_LEN+12] = "PRIVMSG ";
+	char buf[IRC_MSG_LEN+IRC_NICK_LEN+13] = "PRIVMSG ";
 	unsigned int i, j;
 
 	for(j=0, i=8; j<IRC_NICK_LEN && nick[j]!='\0'; j++, i++)
@@ -121,8 +122,9 @@ irc_cmd(char *msg)
 {
 	int i;
 	for(i=0; msg[i]; i++);
-	msg[i] = '\n';
-	write(fd, msg, i+1);
+	msg[i] = '\r'; i++;
+	msg[i] = '\n'; i++;
+	write(fd, msg, i);
 }
 
 unsigned int
@@ -130,10 +132,14 @@ irc_read(char *msg)
 {
 	unsigned int i;
 
-	for(i=0; i<IRC_MSG_LEN-1; i++)
+	for(i=0; i<IRC_MSG_LEN-1; i++) {
 		if(!read(fd, msg+i, 1) || msg[i]=='\n')
 			break;
-	msg[i] = '\0';
+	}
+	if(i && msg[i-1]=='\r')
+		msg[i-1] = '\0';
+	else
+		msg[i] = '\0';
 	if(i==IRC_MSG_LEN-1) /* we didn't read a whole line */
 		return IRC_MSG_LEN;
 	return i;
@@ -144,7 +150,7 @@ irc_quit(void)
 {
 	char buf[128] = "QUIT :";
 	strcat(buf, conf.qmsg);
-	strcat(buf, "\n");
+	strcat(buf, "\r\n");
 	irc_cmd(buf);
 	exit(EXIT_SUCCESS);
 }

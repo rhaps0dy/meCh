@@ -7,5 +7,6 @@ Config conf = {
 	"meCh2",
 	"#test",
 	"I'll be taking my leave then. Goodbye",
-	"rhaps0dy"
+	"rhaps0dy",
+	'.'
 };
