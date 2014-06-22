@@ -182,4 +182,5 @@ mod_init(void)
 	mod_tell();
 	/*mod_fortune();*/
 	mod_seen();
+	mod_on();
 }

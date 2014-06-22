@@ -96,18 +96,31 @@ do_tell(Module *m, char **args, enum irc_type type)
 	if(type==T_CHAN && strcmp(args[1], ".tell")) return;
 	if(strcmp(args[1], "tell")) return;
 
+	if(!strcmp(args[0], args[2])) {
+		switch(type) {
+			case T_CHAN:
+				sprintf(buf, "%s: You can tell yourself that.", args[0]);
+				irc_say(buf);
+				return;
+			case T_MSG:
+				irc_msg(args[0], "You can tell yourself that.");
+				return;
+			default: return;
+		}
+	}
+
 	add_msg(args[0], args[2], args[3], (type==T_MSG));
 
 	switch(type) {
 		case T_CHAN:
-			sprintf(buf, "I'll pass your message to %s.", args[2]);
+			sprintf(buf, "%s: I'll pass your message to %s.", args[0], args[2]);
 			irc_say(buf);
 			return;
 		case T_MSG:
 			sprintf(buf, "I'll pass your message to %s privately.", args[2]);
 			irc_msg(args[0], buf);
 			return;
-		default: ;
+		default: return;
 	}
 }
 

@@ -20,7 +20,7 @@ static Module lastseen = {
 	NULL
 };
 
-static LastSeen base = {"", "", 0, NULL};
+LastSeen base = {"", "", 0, NULL};
 
 LastSeen *
 ls_find(char *name)

@@ -46,16 +46,24 @@ tell_seen(Module *m, char **args, enum irc_type type)
 	LastSeen *l;
 	char buf[IRC_MSG_LEN];
 
-	l = ls_find(args[2]);
-	if(!l) {
-		sprintf(buf, "Sorry, %s is not in the records.", args[2]);
-		goto say;
-	}
 	if(type==T_CHAN) {
 		strcpy(buf, args[0]);
 		strcat(buf, ": ");
 	}
 	else buf[0] = '\0';
+	
+	if(!strcmp(args[0], args[2])) {
+		strcat(buf, "You have been seen right now.");
+		goto say;
+	}
+
+	l = ls_find(args[2]);
+	if(!l) {
+		strcat(buf, "Sorry, ");
+		strcat(buf, args[2]);
+		strcat(buf, " is not in the records.");
+		goto say;
+	}
 	strcat(buf, args[0]);
 	strcat(buf, " was last seen ");
 	append_diff(buf, difftime(time(NULL), l->seen)); 

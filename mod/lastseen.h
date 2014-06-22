@@ -12,6 +12,9 @@ struct LastSeen {
 	LastSeen *next;
 };
 
+/* start of the chain */
+extern LastSeen base;
+
 /* find a LastSeen in the chain with the given name */
 LastSeen *ls_find(char *name);
 
