@@ -13,7 +13,7 @@ static void do_tell(Module *m, char **args, enum irc_type type);
 
 static Module tell = {
 	"Tell",
-	"$0 <nick> <message to leave a message for <nick>. If you tell that "
+	".tell <nick> <message> to leave message <message> for <nick>. If you tell that "
 	"to the bot privately, it will send the message in private.",
 	mod_invokers,
 	do_tell,

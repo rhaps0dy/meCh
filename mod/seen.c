@@ -1,44 +1,27 @@
-#include "../module.h"
 #include "../irc.h"
-#include "../config.h"
+#include <time.h>
+#include "lastseen.h"
+
+#include "../module.h"
 #include "../utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <math.h>
 
-static Module seen;
+static char *mod_invokers[2] = {"seen", NULL};
+static void tell_seen(Module *m, char **args, enum irc_type type);
 
-/* We'll use a linked list for storing times and last utterances. O(n) is okay */
-typedef struct LastSeen LastSeen;
-struct LastSeen {
-	char name[IRC_NICK_LEN];
-	char msg[IRC_MSG_LEN];
-	time_t seen;
-	LastSeen *next;
+static Module seen = {
+	"Seen",
+	".seen <nick> to see last time <nick> spoke, and what was said.",
+	mod_invokers,
+	tell_seen,
+	4,
+	T_CHAN|T_MSG,
+	NULL
 };
-
-static LastSeen base = {"", "", 0, NULL};
-
-
-static LastSeen *
-find_time(char *name)
-{
-	LastSeen *l;
-	l = base.next;
-	while(l) {
-		if(!strcmp(l->name, name))
-			return l;
-		l = l->next;
-	}
-	l = (LastSeen *) malloc(sizeof(LastSeen));
-	strcpy(l->name, name);
-	l->next = base.next;
-	base.next = l;
-	return l;
-}
 
 static void
 append_diff(char *msg, double dt)
@@ -58,52 +41,39 @@ append_diff(char *msg, double dt)
 }
 
 static void
-do_seen(Module *m, char *nick, char *msg, int type)
+tell_seen(Module *m, char **args, enum irc_type type)
 {
 	LastSeen *l;
-	unsigned int i;
 	char buf[IRC_MSG_LEN];
 
-	l = find_time(nick);
-	strcpy(l->msg, msg);
-	l->seen = time(NULL);
-	if(!strbeg(msg, ".seen")) return;
-	for(; *msg && *msg!=' '; msg++);
-	if(!*msg) return;
-	msg++;
-	for(i=0; msg[i] && msg[i]!=' '; i++);
-	msg[i] = '\0';
-	l = find_time(msg);
-	strcpy(buf, msg);
+	printf("seen: '%s' '%s' '%s' '%s'\n", args[0], args[1], args[2], args[3]);
+
+	l = ls_find(args[2]);
+	if(!l) {
+		sprintf(buf, "Sorry, %s is not in the records.", args[2]);
+		goto say;
+	}
+	if(type==T_CHAN) {
+		strcpy(buf, args[0]);
+		strcat(buf, ": ");
+	}
+	else buf[0] = '\0';
+	strcat(buf, args[0]);
 	strcat(buf, " was last seen ");
 	append_diff(buf, difftime(time(NULL), l->seen)); 
 	strcat(buf, " ago, saying \"");
 	strcat_msg(buf, l->msg);
 	strcat_msg(buf, "\"");
-	msg[IRC_MSG_LEN-2] = '"';
-	irc_say(msg);
-}
-
-static void
-free_seen(void)
-{
-	LastSeen *l, *ln;
-	l = base.next;
-	while(l) {
-		ln = l->next;
-		free(l);
-		l = ln;
-	}
+	buf[IRC_MSG_LEN-2] = '"';
+	buf[IRC_MSG_LEN-1] = '\0';
+say:
+	if(type==T_CHAN) irc_say(buf);
+	else irc_msg(args[0], buf);
 }
 
 void
 mod_seen(void)
 {
-	seen.name = "Seen";
-	seen.help = "\".seen <nick>\" to see the last time and utterance of that nick.";
-	seen.next = 0;
-	seen.f = do_seen;
-	seen.on = T_CHAN;
+	mod_lastseen();
 	mod_add(&seen);
-	atexit(free_seen);
 }
