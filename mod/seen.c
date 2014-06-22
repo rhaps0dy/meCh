@@ -64,7 +64,7 @@ tell_seen(Module *m, char **args, enum irc_type type)
 		strcat(buf, " is not in the records.");
 		goto say;
 	}
-	strcat(buf, args[0]);
+	strcat(buf, args[2]);
 	strcat(buf, " was last seen ");
 	append_diff(buf, difftime(time(NULL), l->seen)); 
 	strcat(buf, " ago, saying \"");
