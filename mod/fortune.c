@@ -1,5 +1,5 @@
-#include "../module.h"
 #include "../irc.h"
+#include "../module.h"
 #include "../config.h"
 #include "../utils.h"
 
@@ -11,18 +11,26 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-static Module fortune;
-static char fortune_help[IRC_NICK_LEN+53];
+static void do_fortune(Module *m, char **args, enum irc_type type);
+static char *mod_invokers[2] = {"fortune", NULL};
+
+static Module fortune = {
+	"Fortune",
+	"$0 to know your fortune",
+	mod_invokers,
+	do_fortune,
+	3,
+	T_CHAN|T_MSG,
+	NULL
+};
 
 static void
-do_fortune(Module *m, char *nick, char *msg, int type)
+do_fortune(Module *m, char **args, enum irc_type type)
 {
 	int fd[2];
 	int status, i, j;
 	char buf[IRC_MSG_LEN];
 
-	if(type==T_CHAN && msg[0]=='.') msg++;
-	if(!strbeg(msg, "fortune")) return;
 	pipe(fd);
 	if(!fork()) {
 		dup2(fd[1], 1);
@@ -42,14 +50,10 @@ do_fortune(Module *m, char *nick, char *msg, int type)
 		if(buf[i]) buf[i] = '\0';
 		else return;
 
-		switch(type) {
-		case T_CHAN:
+	if(type==T_CHAN)
 			irc_say(buf+j);
-			break;
-		case T_MSG:
-			irc_msg(nick, buf+j);
-			break;
-		}
+	else
+			irc_msg(args[0], buf+j);
 	}
 }
 
@@ -58,19 +62,13 @@ mod_fortune(void)
 {
 	int status;
 
-	fortune.name = "Fortune";
-	fortune.help = fortune_help;
-	sprintf(fortune_help, "\".fortune\" or \"/msg %s fortune\" to know your fortune.", conf.name);
-	fortune.next = 0;
-	fortune.on = T_CHAN | T_MSG;
-
 	/* try to execute the "fortune" program */
 	if(!fork()) {
 		execlp("fortune", "fortune", NULL);
 		exit(1); /* should not be reachable */
 	}
 	wait(&status);
-	printf("status %d\n", status);
+	printf("\"fortune\" exit status: %d\n", status);
 	if(status) {
 		puts("The \"fortune\" program cannot be found in this system. The Fortune "
 			"module will not be loaded");

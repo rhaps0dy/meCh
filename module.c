@@ -180,7 +180,7 @@ mod_init(void)
 	/* Register modules here */
 	mod_utopia();
 	mod_tell();
-	/*mod_fortune();*/
+	mod_fortune();
 	mod_seen();
 	mod_on();
 }
