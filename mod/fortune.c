@@ -74,6 +74,5 @@ mod_fortune(void)
 			"module will not be loaded");
 		return;
 	}
-	fortune.f = do_fortune;
 	mod_add(&fortune);
 }
