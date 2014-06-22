@@ -1,29 +1,39 @@
-#include "../module.h"
 #include "../irc.h"
+#include "../module.h"
 #include "../config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-static Module utopia;
+static char *mod_invokers[1] = {NULL};
+static void give_op(Module *m, char **args, enum irc_type type);
+
+static Module mod = {
+	"Utopia",
+	"this is a socialist utopia. Don't be a meanie!",
+	mod_invokers,
+	give_op,
+	1,
+	T_JOIN,
+	NULL
+};
 
 static void
-give_op(Module *m, char *nick, char *msg, int type)
+give_op(Module *m, char **args, enum irc_type type)
 {
 	char buf[IRC_MSG_LEN];
+
+	sleep(5);
 	sprintf(buf, "Hello, %s! Welcome to %s, a socialist utopia. "
-		"Don't be a meanie!", nick, conf.chan);
+		"Don't be a meanie!", args[0], conf.chan);
 	irc_say(buf);
-	sprintf(buf, "MODE %s +o %s", conf.chan, nick);
+	sprintf(buf, "MODE %s +o %s", conf.chan, args[0]);
 	irc_cmd(buf);
 }
 
 void
 mod_utopia(void)
 {
-	utopia.name = "Utopia";
-	utopia.help = "my channel is a socialist utopia. Don't be a meanie!";
-	utopia.next = 0;
-	utopia.f = give_op;
-	utopia.on = T_JOIN;
-	mod_add(&utopia);
+	mod_add(&mod);
 }
