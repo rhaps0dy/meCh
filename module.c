@@ -34,6 +34,8 @@ help(Module *m, char **args, enum irc_type type)
 {
 	char aux[IRC_MSG_LEN], buf[IRC_MSG_LEN], act;
 	unsigned int i, j, n, len, k;
+	/* i is the string index of the message we build. j is the string index of m->help.
+	n is the arg number on a $<n>. k is the length of <n> in chars*/
 
 	do {
 		for(i=0; i<IRC_MSG_LEN && (buf[i]=m->name[i]); i++);
@@ -119,12 +121,12 @@ mod_handle(char *msg)
 	txtlen = strlen(txt);
 	for(i=2; i<nargsrec; i++) {
 		args[i] = strtok(NULL, " ");
+		spaces[i-2] = args[i-1]+strlen(args[i-1]);
 		if(!args[i]) {
 			args[i] = args[1]+txtlen;
 			spaces[i-2] = args[i];
 			break;
 		}
-		spaces[i-2] = args[i]-1;
 	}
 	actlen = strlen(args[i-1]);
 	if(args[i-1]+actlen != args[i])
@@ -132,7 +134,7 @@ mod_handle(char *msg)
 	nargs = i;
 	for(; i<nargsrec; i++) {
 		args[i] = args[nargs];
-		spaces[i] = args[nargs];
+		spaces[i-2] = args[nargs];
 	}
 
 	/*printf("nargs: %d, nargsrec: %d\n", nargs, nargsrec);
@@ -158,9 +160,9 @@ mod_handle(char *msg)
 		}
 
 		if(callmod) {
-			for(i=0; i<m->nargs-2; i++)
+			for(i=0; i<nargs-2 && i<m->nargs-2; i++)
 				*spaces[i] = '\0';
-			for(; i<nargsrec-2; i++)
+			for(; i<nargs-2 && i<nargsrec-2; i++)
 				*spaces[i] = ' ';
 			/*printf("Module %s\n", m->name);
 			for(i=0; i<m->nargs; i++)
@@ -177,8 +179,8 @@ mod_init(void)
 	nargsrec = mod.nargs;
 
 	/* Register modules here */
-	/*mod_utopia();
+	mod_utopia();
 	mod_tell();
-	mod_fortune();
+	/*mod_fortune();
 	mod_seen();*/
 }

@@ -1,5 +1,5 @@
-#include "../module.h"
 #include "../irc.h"
+#include "../module.h"
 #include "../config.h"
 #include "../utils.h"
 
@@ -7,9 +7,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-static Module tell;
-static char tell_help[IRC_MSG_LEN];
-static char* usage = "Usage: .tell <nick> <message>";
+/* we want to be called even if no invoker is used */
+static char *mod_invokers[1] = {NULL};
+static void do_tell(Module *m, char **args, enum irc_type type);
+
+static Module tell = {
+	"Tell",
+	"$0 <nick> <message to leave a message for <nick>. If you tell that "
+	"to the bot privately, it will send the message in private.",
+	mod_invokers,
+	do_tell,
+	4,
+	T_JOIN|T_CHAN|T_MSG,
+	NULL
+};
 
 /* We'll use a linked list for storing messages. O(n) is okay */
 typedef struct TellMsg TellMsg;
@@ -23,28 +34,18 @@ struct TellMsg {
 
 static TellMsg base = {"", "", "", 0, NULL};
 
-static int
-add_msg(char *sender, char *msg, char private)
+static void
+add_msg(char *sender, char *name, char *msg, char private)
 {
 	TellMsg *new;
-	unsigned int i;
 
 	new = (TellMsg *) malloc(sizeof(TellMsg));
 	strcpy(new->sender, sender);
-	for(; *msg && *msg!=' '; msg++);
-	if(!*msg) goto err;
-	msg++;
-	for(i=0; i<IRC_NICK_LEN-1 && msg[i] && (new->name[i]=msg[i])!=' '; i++);
-	if(i==0 || !msg[i]) goto err;
-	new->name[i] = '\0';
-	strcpy(new->msg, msg+i);
+	strcpy(new->name, name);
+	strcpy(new->msg, msg);
 	new->private = private;
 	new->next = base.next;
 	base.next = new;
-	return 0;
-err:
-	free(new);
-	return 1;
 }
 
 static TellMsg *
@@ -65,22 +66,22 @@ get_msg(char *name)
 }
 
 static void
-do_tell(Module *m, char *nick, char *msg, int type)
+do_tell(Module *m, char **args, enum irc_type type)
 {
 	TellMsg *tmsg;
 	char buf[IRC_MSG_LEN];
+	int i;
 
 	/* check if we have any message for that nick */
-	while((tmsg=get_msg(nick))) {
+	while((tmsg=get_msg(args[0]))) {
 		buf[0] = '(';
-		buf[1] = '\0';
-		strcat(buf, tmsg->sender);
-		strcat(buf, ")");
+		strcpy(buf+1, tmsg->sender);
+		strcat(buf, ") ");
 		strcat_msg(buf, tmsg->msg);
 		if(tmsg->private)
-			irc_msg(nick, buf);
+			irc_msg(args[0], buf);
 		else {
-			strcpy(tmsg->msg, nick);
+			strcpy(tmsg->msg, args[0]);
 			strcat(tmsg->msg, ": ");
 			strcat_msg(tmsg->msg, buf);
 			irc_say(tmsg->msg);
@@ -88,38 +89,44 @@ do_tell(Module *m, char *nick, char *msg, int type)
 		free(tmsg);
 	}
 
-	if(type==T_CHAN && msg[0]=='.') msg++;
-	if(!strbeg(msg, "tell")) return;
+	for(i=0; i<4; i++)
+		if(!args[i])
+			return;
+
+	if(type==T_CHAN && strcmp(args[1], ".tell")) return;
+	if(strcmp(args[1], "tell")) return;
+
+	add_msg(args[0], args[2], args[3], (type==T_MSG));
+
 	switch(type) {
-	case T_CHAN:
-		if(add_msg(nick, msg, 0)) {
-			irc_say(usage);
+		case T_CHAN:
+			sprintf(buf, "I'll pass your message to %s.", args[2]);
+			irc_say(buf);
 			return;
-		}
-		sprintf(buf, "I'll pass your message to %s.", base.next->name);
-		irc_say(buf);
-		return;
-	case T_MSG:
-		if(add_msg(nick, msg, 1)) {
-			irc_msg(nick, usage);
+		case T_MSG:
+			sprintf(buf, "I'll pass your message to %s privately.", args[2]);
+			irc_msg(args[0], buf);
 			return;
-		}
-		sprintf(buf, "I'll pass your message to %s privately.", base.next->name);
-		irc_msg(nick, buf);
-		return;
+		default: ;
+	}
+}
+
+static void
+erase_tell(void)
+{
+	TellMsg *t, *tn;
+
+	t = base.next;
+	while(t) {
+		tn = t->next;
+		free(t);
+		t = tn;
 	}
 }
 
 void
 mod_tell(void)
 {
-	tell.name = "Tell";
-	tell.help = tell_help;
-	sprintf(tell_help, "\".tell <nick> <message>\" to leave a public message for someone. "
-		"\"/msg %s tell <nick> <message>\" will privately send the message to that nick when they "
-		"say something in the channel or to me.", conf.name);
-	tell.next = 0;
-	tell.f = do_tell;
-	tell.on = T_JOIN|T_CHAN|T_MSG;
+	atexit(erase_tell);
 	mod_add(&tell);
 }
