@@ -28,7 +28,7 @@ static void
 do_fortune(Module *m, char **args, enum irc_type type)
 {
 	int fd[2];
-	int status, i, j;
+	int status, i;
 	char buf[IRC_MSG_LEN];
 
 	pipe(fd);
