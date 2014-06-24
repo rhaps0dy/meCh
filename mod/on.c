@@ -24,6 +24,10 @@ static Module on = {
 };
 
 static char *usage = "Usage: .on <minutes>";
+static char min_default[64];
+/* TODO: make config file */
+#define DEFAULT_MINUTES 10
+
 
 static int
 proper_atoi(char *a)
@@ -63,8 +67,8 @@ tell_on(Module *m, char **args, enum irc_type type)
 		strcat(buf, args[2]);
 		strcat(buf, " minutes: ");
 	} else {
-		minutes = 5;
-		strcat(buf, "Seen on the last 5 (default) minutes: ");
+		minutes = DEFAULT_MINUTES;
+		strcat(buf, min_default);
 	}
 
 	seconds = ((double)minutes) * 60.;
@@ -87,6 +91,7 @@ say:
 void
 mod_on(void)
 {
+	sprintf(min_default, "Seen on the last %d (default) minutes: ", DEFAULT_MINUTES);
 	mod_lastseen();
 	mod_add(&on);
 }

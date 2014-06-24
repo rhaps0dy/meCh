@@ -24,7 +24,7 @@ give_op(Module *m, char **args, enum irc_type type)
 {
 	char buf[IRC_MSG_LEN];
 
-	sleep(5);
+	sleep(2);
 	sprintf(buf, "Hello, %s! Welcome to %s, a socialist utopia. "
 		"Don't be a meanie!", args[0], conf.chan);
 	irc_say(buf);

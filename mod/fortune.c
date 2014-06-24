@@ -40,13 +40,12 @@ do_fortune(Module *m, char **args, enum irc_type type)
 	close(fd[1]);
 	wait(&status);
 	i = read(fd[0], buf, IRC_MSG_LEN);
+	close(fd[0]);
 	buf[i] = '\0';
 
-	for(i=0; buf[i]; i++) {
+	for(i=0; buf[i]; i++)
 		if(buf[i]=='\t' || buf[i]=='\n')
 			buf[i] = ' ';
-		else if(buf[i]) buf[i] = '\0';
-	}
 	
 	if(type==T_CHAN)
 		irc_say(buf);
