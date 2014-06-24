@@ -33,6 +33,7 @@ struct TellMsg {
 };
 
 static TellMsg base = {"", "", "", 0, NULL};
+static TellMsg *last = &base;
 
 static void
 add_msg(char *sender, char *name, char *msg, char private)
@@ -44,8 +45,8 @@ add_msg(char *sender, char *name, char *msg, char private)
 	strcpy(new->name, name);
 	strcpy(new->msg, msg);
 	new->private = private;
-	new->next = base.next;
-	base.next = new;
+	last->next = new;
+	last = new;
 }
 
 static TellMsg *
@@ -71,8 +72,6 @@ do_tell(Module *m, char **args, enum irc_type type)
 	TellMsg *tmsg;
 	char buf[IRC_MSG_LEN];
 	int i;
-
-	printf("tell: '%s' '%s' '%s' '%s'\n", args[0], args[1], args[2], args[3]);
 
 	/* check if we have any message for that nick */
 	while((tmsg=get_msg(args[0]))) {
