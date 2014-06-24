@@ -119,6 +119,7 @@ mod_handle(char *msg)
 	 * If it was <=2 it should be checked and accounted for*/
 	txtlen = strlen(txt);
 	args[1] = strtok(txt, " ");
+	if(!args[1]) args[1] = txt;
 	for(i=2; i<nargsrec; i++) {
 		args[i] = strtok(NULL, " ");
 		spaces[i-2] = args[i-1]+strlen(args[i-1]);
