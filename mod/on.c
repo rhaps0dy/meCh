@@ -52,15 +52,20 @@ tell_on(Module *m, char **args, enum irc_type type)
 	}
 	else buf[0] = '\0';
 
-	minutes = proper_atoi(args[2]);
-	if(minutes<0) {
-		strcat(buf, usage);
-		goto say;
-	}
+	if(*args[2]) {
+		minutes = proper_atoi(args[2]);
+		if(minutes<0) {
+			strcat(buf, usage);
+			goto say;
+		}
 
-	strcat(buf, "Seen on the last ");
-	strcat(buf, args[2]);
-	strcat(buf, " minutes: ");
+		strcat(buf, "Seen on the last ");
+		strcat(buf, args[2]);
+		strcat(buf, " minutes: ");
+	} else {
+		minutes = 5;
+		strcat(buf, "Seen on the last 5 (default) minutes: ");
+	}
 
 	seconds = ((double)minutes) * 60.;
 	time(&now);

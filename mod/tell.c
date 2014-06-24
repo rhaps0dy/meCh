@@ -72,6 +72,8 @@ do_tell(Module *m, char **args, enum irc_type type)
 	char buf[IRC_MSG_LEN];
 	int i;
 
+	printf("tell: '%s' '%s' '%s' '%s'\n", args[0], args[1], args[2], args[3]);
+
 	/* check if we have any message for that nick */
 	while((tmsg=get_msg(args[0]))) {
 		buf[0] = '(';
@@ -90,11 +92,16 @@ do_tell(Module *m, char **args, enum irc_type type)
 	}
 
 	for(i=0; i<4; i++)
-		if(!args[i])
+		if(!*args[i])
 			return;
 
-	if(type==T_CHAN && strcmp(args[1], ".tell")) return;
-	if(strcmp(args[1], "tell")) return;
+	if(type==T_CHAN) {
+		if(strcmp(args[1], ".tell"))
+			return;
+	} else if(type==T_MSG) {
+		if(strcmp(args[1], "tell"))
+			return;
+	} else return;
 
 	if(!strcmp(args[0], args[2])) {
 		switch(type) {
