@@ -28,7 +28,7 @@ static void
 do_fortune(Module *m, char **args, enum irc_type type)
 {
 	int fd[2];
-	int status, i, j;
+	int status, i;
 	char buf[IRC_MSG_LEN];
 
 	pipe(fd);
@@ -43,18 +43,15 @@ do_fortune(Module *m, char **args, enum irc_type type)
 	buf[i] = '\0';
 
 	for(i=0; buf[i]; i++) {
-		j=i;
-		for(; buf[i] && buf[i]!='\n'; i++)
-			if(buf[i]=='\t')
-				buf[i] = ' ';
-		if(buf[i]) buf[i] = '\0';
-		else return;
-
-	if(type==T_CHAN)
-			irc_say(buf+j);
-	else
-			irc_msg(args[0], buf+j);
+		if(buf[i]=='\t' || buf[i]=='\n')
+			buf[i] = ' ';
+		else if(buf[i]) buf[i] = '\0';
 	}
+	
+	if(type==T_CHAN)
+		irc_say(buf);
+	else
+		irc_msg(args[0], buf);
 }
 
 void
@@ -74,6 +71,5 @@ mod_fortune(void)
 			"module will not be loaded");
 		return;
 	}
-	fortune.f = do_fortune;
 	mod_add(&fortune);
 }
