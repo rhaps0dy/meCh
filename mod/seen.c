@@ -51,6 +51,11 @@ tell_seen(Module *m, char **args, enum irc_type type)
 		strcat(buf, ": ");
 	}
 	else buf[0] = '\0';
+
+	if(!*args[2]) {
+		strcat(buf, "Usage: .seen <nick>");
+		goto say;
+	}
 	
 	if(!strcmp(args[0], args[2])) {
 		strcat(buf, "You have been seen right now.");
