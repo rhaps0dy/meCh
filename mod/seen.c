@@ -57,7 +57,7 @@ tell_seen(Module *m, char **args, enum irc_type type)
 		goto say;
 	}
 	
-	if(!strcmp(args[0], args[2])) {
+	if(!strcasecmp(args[0], args[2])) {
 		strcat(buf, "You have been seen right now.");
 		goto say;
 	}
