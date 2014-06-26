@@ -28,7 +28,7 @@ ls_find(char *name)
 	LastSeen *l;
 	l = base.next;
 	while(l) {
-		if(!strcmp(l->name, name))
+		if(!strcasecmp(l->name, name)) //case insensitive strcmp - for win32 use stricmp
 			return l;
 		l = l->next;
 	}
