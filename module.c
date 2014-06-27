@@ -100,7 +100,6 @@ mod_handle(char *msg)
 {
 	Module *m;
 	int i, nargs = 2, call_module;
-	unsigned int txtlen, actlen;
 	char nick[IRC_NICK_LEN];
 	char txt[IRC_MSG_LEN];
 	enum irc_type type;
@@ -115,37 +114,24 @@ mod_handle(char *msg)
 	msg[0] = '\0'; /* mark message as copied */
 
 	args[0] = nick;
-	/* this piece works because nargsrec is >=3 always.
-	 * If it was <=2 it should be checked and accounted for*/
-	txtlen = strlen(txt);
-	args[1] = strtok(txt, " ");
-	if(!args[1]) {
-		/* we're dealing with a message of only spaces */
-		args[1] = txt;
-		*args[1] = '\0';
-	}
-	for(i=2; i<nargsrec; i++) {
-		args[i] = strtok(NULL, " ");
-		spaces[i-2] = args[i-1]+strlen(args[i-1]);
-		if(!args[i]) {
-			args[i] = args[1]+txtlen;
-			break;
-		}
-	}
-	actlen = strlen(args[i-1]);
-	if(i==nargsrec && args[i-1]+actlen != args[i])
-		args[i-1][actlen] = ' ';
-	nargs = i;
-	for(; i<nargsrec; i++) {
-		args[i] = args[nargs];
-		spaces[i-2] = NULL;
-	}
 
-	/*printf("nargs: %d, nargsrec: %d\n", nargs, nargsrec);
-	for(i=0; i<nargsrec; i++)
-		printf("args[%d]: (%d) %s\n", i, *args[i], args[i]);
-	for(i=0; i<nargs-2; i++)
-		printf("spaces[%d]: %ld\n", i, spaces[i]-args[1]);*/
+	/* nargs cannot be smaller than 2, and the base "Help" module already
+	 * defines nargsrec=3, so this works. */
+	args[1] = msg = txt;
+	nargs = 1;
+	do {
+		nargs++;
+		for(; *msg==' '; msg++)
+			if(!*msg) goto out;
+		args[nargs-1] = msg;
+		for(; *msg!=' '; msg++)
+			if(!*msg) goto out;
+		spaces[nargs-2] = msg;
+	} while(nargs < nargsrec);
+out:
+	for(; *msg; msg++);
+	for(i=nargs; i<nargsrec; i++)
+		args[i] = msg;
 
 	m = &mod;
 	do {
@@ -168,9 +154,6 @@ mod_handle(char *msg)
 				*spaces[i] = '\0';
 			for(; i<nargs-2; i++)
 				*spaces[i] = ' ';
-			/*printf("Module %s\n", m->name);
-			for(i=0; i<m->nargs; i++)
-				printf("args[%d]: (%d) %s\n", i, *args[i], args[i]);*/
 			m->f(m, args, type);
 		}
 		m = m->next;
