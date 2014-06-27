@@ -23,11 +23,8 @@ static Module on = {
 	NULL
 };
 
-static char *usage = "Usage: .on <minutes>";
-static char min_default[64];
 /* TODO: make config file */
 #define DEFAULT_MINUTES 10
-
 
 static int
 proper_atoi(char *a)
@@ -50,25 +47,17 @@ tell_on(Module *m, char **args, enum irc_type type)
 	time_t now;
 	double dt, seconds;
 
-	if(type==T_CHAN) {
-		strcpy(buf, args[0]);
-		strcat(buf, ": ");
-	}
-	else buf[0] = '\0';
-
 	if(*args[2]) {
 		minutes = proper_atoi(args[2]);
 		if(minutes<0) {
-			strcat(buf, usage);
+			strcpy(buf, "Usage: .on [minutes]");
 			goto say;
 		}
 
-		strcat(buf, "Seen on the last ");
-		strcat(buf, args[2]);
-		strcat(buf, " minutes: ");
+		sprintf(buf, "Seen on the last %s minutes: ", args[2]);
 	} else {
 		minutes = DEFAULT_MINUTES;
-		strcat(buf, min_default);
+		sprintf(buf, "Seen on the last %d (default) minutes: ", DEFAULT_MINUTES);
 	}
 
 	seconds = ((double)minutes) * 60.;
@@ -83,15 +72,14 @@ tell_on(Module *m, char **args, enum irc_type type)
 		}
 		l = l->next;
 	}
+
 say:
-	if(type==T_CHAN) irc_say(buf);
-	else irc_msg(args[0], buf);
+	irc_reply(args[0], buf, type);
 }
 
 void
 mod_on(void)
 {
-	sprintf(min_default, "Seen on the last %d (default) minutes: ", DEFAULT_MINUTES);
 	mod_lastseen();
 	mod_add(&on);
 }

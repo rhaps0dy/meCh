@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 static char *mod_invokers[1] = { NULL };
 static void do_seen(Module *m, char **args, enum irc_type type);

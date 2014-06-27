@@ -26,6 +26,7 @@ void irc_say(char *msg);
 void irc_msg(char *nick, char *msg);
 /* sends a raw command */
 void irc_cmd(char *msg);
+/* either says nick: <message> on channel or sends message to nick */
 
 /* reads one line from the server and null-terminates it.
  * the size of the msg buffer should be at least
@@ -45,12 +46,5 @@ void irc_quit(void);
  * txt should be IRC_MSG_LEN too
  */
 
-/* extracts the nick from a message */
-void irc_get_nick(char *nick, char *msg);
-
-/* extracts the message type
- * returns one of T_* */
-enum irc_type irc_get_type(char *msg);
-
-/* extracts text */
-void irc_get_text(char *txt, char *msg);
+/* extracts the nick, type and text from a message */
+enum irc_type irc_get(char *nick, char *txt, char *msg);

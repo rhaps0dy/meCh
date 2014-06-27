@@ -1,6 +1,6 @@
 NAME=meCh
 CC=gcc
-CFLAGS=-O3 -Wall -Werror -pedantic -g
+CFLAGS=-O3 -Wall -Werror -ansi -pedantic -g
 LDFLAGS=
 LIBS=-lm
 

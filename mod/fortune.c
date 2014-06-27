@@ -46,11 +46,8 @@ do_fortune(Module *m, char **args, enum irc_type type)
 	for(i=0; buf[i]; i++)
 		if(buf[i]=='\t' || buf[i]=='\n')
 			buf[i] = ' ';
-	
-	if(type==T_CHAN)
-		irc_say(buf);
-	else
-		irc_msg(args[0], buf);
+
+	irc_reply(args[0], buf, type);
 }
 
 void

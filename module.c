@@ -37,6 +37,11 @@ help(Module *m, char **args, enum irc_type type)
 	/* i is the string index of the message we build. j is the string index of m->help.
 	n is the arg number on a $<n>. k is the length of <n> in chars*/
 
+	if(type==T_CHAN) {
+		sprintf(buf, "%s: I'll send you the help in a private message.", args[0]);
+		irc_say(buf);
+	}
+
 	do {
 		for(i=0; i<IRC_MSG_LEN && (buf[i]=m->name[i]); i++);
 		buf[i] = ':';

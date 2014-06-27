@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 /* we want to be called even if no invoker is used */
 static char *mod_invokers[1] = {NULL};
@@ -56,7 +57,7 @@ get_msg(char *name)
 	prevm = &base;
 	m = base.next;
 	while(m) {
-		if(!strcmp(m->name, name)) {
+		if(!strcasecmp(m->name, name)) {
 			prevm->next = m->next;
 			return m;
 		}
@@ -75,22 +76,17 @@ do_tell(Module *m, char **args, enum irc_type type)
 
 	/* check if we have any message for that nick */
 	while((tmsg=get_msg(args[0]))) {
-		buf[0] = '(';
-		strcpy(buf+1, tmsg->sender);
-		strcat(buf, ") ");
-		strcat_msg(buf, tmsg->msg);
-		if(tmsg->private)
+		if(tmsg->private) {
+			snprintf(buf, IRC_MSG_LEN, "(%s) %s", tmsg->sender, tmsg->msg);
 			irc_msg(args[0], buf);
-		else {
-			strcpy(tmsg->msg, args[0]);
-			strcat(tmsg->msg, ": ");
-			strcat_msg(tmsg->msg, buf);
-			irc_say(tmsg->msg);
+		} else {
+			snprintf(buf, IRC_MSG_LEN, "%s: (%s) %s", args[0], tmsg->sender, tmsg->msg);
+			irc_say(buf);
 		}
 		free(tmsg);
 	}
 
-	for(i=0; i<4; i++)
+	for(i=2; i<4; i++)
 		if(!*args[i])
 			return;
 
@@ -102,7 +98,7 @@ do_tell(Module *m, char **args, enum irc_type type)
 			return;
 	} else return;
 
-	if(!strcmp(args[0], args[2])) {
+	if(!strcasecmp(args[0], args[2])) {
 		switch(type) {
 			case T_CHAN:
 				sprintf(buf, "%s: You can tell yourself that.", args[0]);

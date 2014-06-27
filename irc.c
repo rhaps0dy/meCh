@@ -43,7 +43,7 @@ irc_connect(void)
 	printf("Connecting to %s...\n", conf.host);
 	serv = gethostbyname(conf.host);
 	addr.sin_family = AF_INET;
-	memcpy(&addr.sin_addr.s_addr, serv->h_addr, serv->h_length);
+	memcpy(&addr.sin_addr.s_addr, serv->h_addr_list[0], serv->h_length);
 	addr.sin_port = htons(conf.port);
 	if(connect(fd, (struct sockaddr *) &addr, sizeof(addr))<0) {
 		puts("Connection error");

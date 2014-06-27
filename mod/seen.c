@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <math.h>
 
 static char *mod_invokers[2] = {"seen", NULL};
@@ -24,9 +25,8 @@ static Module seen = {
 };
 
 static void
-append_diff(char *msg, double dt)
+print_diff(char buf[64], double dt)
 {
-	char buf[64];
 	if(dt<60.)
 		sprintf(buf, "%.0f seconds", dt);
 	else if(dt<3600.)
@@ -34,52 +34,39 @@ append_diff(char *msg, double dt)
 	else if(dt<3600.*24.)
 		sprintf(buf, "%.0f hours", dt/3600.);
 	else if(dt<3600.*24.*7.)
-		sprintf(buf, "%.0f days %.0f hours", dt/(3600.*24.), (dt-trunc(dt/(3600.*24.)))/3600.);
+		sprintf(buf, "%.0f days %.0f hours", dt/(3600.*24.), (dt-floor(dt/(3600.*24.)))/3600.);
 	else
 		sprintf(buf, "%.0f days", dt/(3600.*24.));
-	strcat(msg, buf);
 }
 
 static void
 tell_seen(Module *m, char **args, enum irc_type type)
 {
 	LastSeen *l;
-	char buf[IRC_MSG_LEN];
-
-	if(type==T_CHAN) {
-		strcpy(buf, args[0]);
-		strcat(buf, ": ");
-	}
-	else buf[0] = '\0';
+	char buf[IRC_MSG_LEN], time_str[64];
 
 	if(!*args[2]) {
-		strcat(buf, "Usage: .seen <nick>");
+		strcpy(buf, "Usage: .seen <nick>");
 		goto say;
 	}
 	
 	if(!strcasecmp(args[0], args[2])) {
-		strcat(buf, "You have been seen right now.");
+		strcpy(buf, "You have been seen right now.");
 		goto say;
 	}
 
 	l = ls_find(args[2]);
 	if(!l) {
-		strcat(buf, "Sorry, ");
-		strcat(buf, args[2]);
-		strcat(buf, " is not in the records.");
+		sprintf(buf, "Sorry, %s is not in the records.", args[2]);
 		goto say;
 	}
-	strcat(buf, l->name);
-	strcat(buf, " was last seen ");
-	append_diff(buf, difftime(time(NULL), l->seen)); 
-	strcat(buf, " ago, saying \"");
-	strcat_msg(buf, l->msg);
-	strcat_msg(buf, "\"");
-	buf[IRC_MSG_LEN-2] = '"';
-	buf[IRC_MSG_LEN-1] = '\0';
+
+	print_diff(time_str, difftime(time(NULL), l->seen));
+	snprintf(buf, IRC_MSG_LEN-buflen, "%s was last seen %s ago, saying \"%s\"",
+		l->name, time_str, l->msg);
+
 say:
-	if(type==T_CHAN) irc_say(buf);
-	else irc_msg(args[0], buf);
+	irc_reply(args[0], buf, type);
 }
 
 void
