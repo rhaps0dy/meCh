@@ -57,7 +57,7 @@ tell_seen(Module *m, char **args, enum irc_type type)
 		goto say;
 	}
 	
-	if(!strcmp(args[0], args[2])) {
+	if(!strcasecmp(args[0], args[2])) {
 		strcat(buf, "You have been seen right now.");
 		goto say;
 	}
@@ -69,7 +69,7 @@ tell_seen(Module *m, char **args, enum irc_type type)
 		strcat(buf, " is not in the records.");
 		goto say;
 	}
-	strcat(buf, args[2]);
+	strcat(buf, l->name);
 	strcat(buf, " was last seen ");
 	append_diff(buf, difftime(time(NULL), l->seen)); 
 	strcat(buf, " ago, saying \"");
