@@ -51,19 +51,9 @@ irc_connect(void)
 	}
 	irc_read(buf);
 	irc_read(buf);
-	strcpy(buf, "USER ");
-	strcat(buf, conf.name);
-	strcat(buf, " ");
-	strcat(buf, conf.name);
-	strcat(buf, " ");
-	strcat(buf, conf.name);
-	strcat(buf, " ");
-	strcat(buf, conf.name);
-	strcat(buf, "\r\n");
+	sprintf(buf, "USER %s %s %s %s", conf.name, conf.name, conf.name, conf.name);
 	irc_cmd(buf);
-	strcpy(buf, "NICK ");
-	strcat(buf, conf.name);
-	strcat(buf, "\r\n");
+	sprintf(buf, "NICK %s", conf.name);
 	irc_cmd(buf);
 	irc_read(buf);
 	buf[1] = 'O';
@@ -72,9 +62,7 @@ irc_connect(void)
 		buf[strlen(conf.name)+1] = '\0';
 		if(!strcmp(buf+1, conf.name)) break;
 	}
-	strcpy(buf, "JOIN ");
-	strcat(buf, conf.chan);
-	strcat(buf, "\r\n");
+	sprintf(buf, "JOIN %s", conf.chan);
 	irc_cmd(buf);
 	puts("Connected!");
 	sprintf(buf, "Hello, I'm %s!", conf.name);
@@ -85,13 +73,13 @@ irc_connect(void)
 static void
 close_msg(char *buf, char *msg, unsigned int i) {
 	unsigned int j;
-	buf[i] = ' ';
-	i++; buf[i] = ':';
-	for(j=0, i++; j<IRC_MSG_LEN && msg[j]!='\0'; j++, i++)
+	buf[i] = ' '; i++;
+	buf[i] = ':'; i++;
+	for(j=0; j<IRC_MSG_LEN && *msg[j]; j++, i++)
 		buf[i] = msg[j];
-	i++; buf[i] = '\r';
-	i++; buf[i] = '\n';
-	i++; buf[i] = '\0';
+	i++;
+	buf[i] = '\r'; i++;
+	buf[i] = '\n'; i++;
 	write(fd, buf, i);
 }
 
