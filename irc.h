@@ -23,11 +23,11 @@ void irc_loop(void);
 /* says this to the channel */
 void irc_say(char msg[IRC_MSG_LEN]);
 /* sends a private message */
-void irc_msg(char nick[IRC_NICK_LEN], char msg[IRC_MSG_LEN]);
+#define irc_msg(NICK, MSG) irc_reply(NICK, MSG, T_MSG)
 /* sends a raw command */
 void irc_cmd(char msg[IRC_MSG_LEN]);
 /* either says nick: <message> on channel or sends message to nick */
-void irc_reply(char nick[IRC_NICK_LEN], char msg[IRC_MSG_LEN]);
+void irc_reply(char nick[IRC_NICK_LEN], char msg[IRC_MSG_LEN], enum irc_type type);
 
 /* reads one line from the server and null-terminates it.
  * the size of the msg buffer should be at least
@@ -49,6 +49,6 @@ void irc_quit(void);
 
 
 /* extracts the type from a message */
-enum irc_type irc_nick(char msg[IRC_MSG_LEN]);
+enum irc_type irc_get_type(char msg[IRC_MSG_LEN]);
 /* extracts the nick, type and text from a message */
 enum irc_type irc_get(char nick[IRC_NICK_LEN], char txt[IRC_MSG_LEN], char msg[IRC_MSG_LEN]);

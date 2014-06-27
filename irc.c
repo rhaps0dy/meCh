@@ -70,53 +70,45 @@ irc_connect(void)
 	while(irc_read(buf) && irc_get_type(buf)!=T_JOIN);
 }
 
-static void
-close_msg(char *buf, char *msg, unsigned int i) {
-	unsigned int j;
-	buf[i] = ' '; i++;
-	buf[i] = ':'; i++;
-	for(j=0; j<IRC_MSG_LEN && *msg[j]; j++, i++)
-		buf[i] = msg[j];
-	i++;
-	buf[i] = '\r'; i++;
-	buf[i] = '\n'; i++;
-	write(fd, buf, i);
-}
-
 void
-irc_say(char *msg)
+irc_say(char msg[IRC_MSG_LEN])
 {
-	char buf[IRC_MSG_LEN+IRC_CHAN_LEN+13] = "PRIVMSG ";
-	unsigned int i, j;
+	char buf[IRC_MSG_LEN];
 
-	for(j=0, i=8; j<IRC_CHAN_LEN && conf.chan[j]!='\0'; j++, i++)
-		buf[i] = conf.chan[j];
-	close_msg(buf, msg, i);
+	snprintf(buf, IRC_MSG_LEN, "PRIVMSG %s :%s", conf.chan, msg);
+	irc_cmd(buf);
 }
 
 void
-irc_msg(char *nick, char *msg)
+irc_reply(char nick[IRC_NICK_LEN], char msg[IRC_MSG_LEN], enum irc_type type)
 {
-	char buf[IRC_MSG_LEN+IRC_NICK_LEN+13] = "PRIVMSG ";
-	unsigned int i, j;
+	char buf[IRC_MSG_LEN];
 
-	for(j=0, i=8; j<IRC_NICK_LEN && nick[j]!='\0'; j++, i++)
-		buf[i] = nick[j];
-	close_msg(buf, msg, i);
+	switch(type) {
+	case T_MSG:
+		snprintf(buf, IRC_MSG_LEN, "PRIVMSG %s :%s", nick, msg);
+		goto finish;
+	case T_CHAN:
+		snprintf(buf, IRC_MSG_LEN, "PRIVMSG %s :%s: %s", conf.chan, nick, msg);
+		goto finish;
+	default: return;
+	}
+finish:
+	irc_cmd(buf);
 }
 
 void
-irc_cmd(char *msg)
+irc_cmd(char msg[IRC_MSG_LEN])
 {
 	int i;
-	for(i=0; msg[i]; i++);
+	for(i=0; i<IRC_MSG_LEN-2 && msg[i]; i++);
 	msg[i] = '\r'; i++;
 	msg[i] = '\n'; i++;
 	write(fd, msg, i);
 }
 
 unsigned int
-irc_read(char *msg)
+irc_read(char msg[IRC_MSG_LEN])
 {
 	unsigned int i;
 
@@ -128,17 +120,14 @@ irc_read(char *msg)
 		msg[i-1] = '\0';
 	else
 		msg[i] = '\0';
-	if(i==IRC_MSG_LEN-1) /* we didn't read a whole line */
-		return IRC_MSG_LEN;
 	return i;
 }
 
 void
 irc_quit(void)
 {
-	char buf[128] = "QUIT :";
-	strcat(buf, conf.qmsg);
-	strcat(buf, "\r\n");
+	char buf[128];
+	sprintf(buf, "QUIT :%s", conf.qmsg);
 	irc_cmd(buf);
 	exit(EXIT_SUCCESS);
 }
