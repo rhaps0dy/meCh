@@ -39,7 +39,7 @@ do_fortune(char **args, enum irc_type type)
 	}
 	close(fd[1]);
 	wait(&status);
-	i = read(fd[0], buf, IRC_MSG_LEN);
+	i = read(fd[0], buf, IRC_MSG_LEN-1);
 	close(fd[0]);
 	buf[i] = '\0';
 
