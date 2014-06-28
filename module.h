@@ -44,3 +44,4 @@ void mod_tell(void);
 void mod_fortune(void);
 void mod_seen(void);
 void mod_on(void);
+void mod_1337(void);

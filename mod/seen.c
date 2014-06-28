@@ -62,7 +62,7 @@ tell_seen(Module *m, char **args, enum irc_type type)
 	}
 
 	print_diff(time_str, difftime(time(NULL), l->seen));
-	snprintf(buf, IRC_MSG_LEN-buflen, "%s was last seen %s ago, saying \"%s\"",
+	snprintf(buf, IRC_MSG_LEN, "%s was last seen %s ago, saying \"%s\"",
 		l->name, time_str, l->msg);
 
 say:

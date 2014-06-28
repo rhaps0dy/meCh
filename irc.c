@@ -133,7 +133,7 @@ irc_quit(void)
 }
 
 void
-irc_get_nick(char *nick, char *msg)
+irc_get_nick(char nick[IRC_NICK_LEN], char msg[IRC_MSG_LEN])
 {
 	unsigned int i;
 
@@ -148,7 +148,7 @@ irc_get_nick(char *nick, char *msg)
 }
 
 enum irc_type
-irc_get_type(char *msg)
+irc_get_type(char msg[IRC_MSG_LEN])
 {
 	unsigned int i;
 
@@ -167,7 +167,7 @@ irc_get_type(char *msg)
 }
 
 void
-irc_get_text(char *txt, char *msg)
+irc_get_text(char txt[IRC_MSG_LEN], char msg[IRC_MSG_LEN])
 {
 	int i;
 

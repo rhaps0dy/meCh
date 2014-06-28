@@ -176,4 +176,5 @@ mod_init(void)
 	mod_fortune();
 	mod_seen();
 	mod_on();
+	mod_1337();
 }

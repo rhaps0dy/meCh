@@ -50,5 +50,7 @@ void irc_quit(void);
 
 /* extracts the type from a message */
 enum irc_type irc_get_type(char msg[IRC_MSG_LEN]);
-/* extracts the nick, type and text from a message */
-enum irc_type irc_get(char nick[IRC_NICK_LEN], char txt[IRC_MSG_LEN], char msg[IRC_MSG_LEN]);
+/* extracts the nick from a message */
+void irc_get_nick(char nick[IRC_NICK_LEN], char msg[IRC_MSG_LEN]);
+/* extracts the text from a message */
+void irc_get_text(char txt[IRC_MSG_LEN], char msg[IRC_MSG_LEN]);
