@@ -138,6 +138,8 @@ out:
 	for(; *msg; msg++);
 	for(i=nargs; i<nargsrec; i++)
 		args[i] = msg;
+	if(nargs>=2)
+		*spaces[0] = '\0';
 
 	m = &mod;
 	do {
