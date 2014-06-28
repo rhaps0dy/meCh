@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 static char *mod_invokers[1] = {NULL};
-static void give_op(Module *m, char **args, enum irc_type type);
+static void give_op(char **args, enum irc_type type);
 
 static Module mod = {
 	"Utopia",
@@ -20,9 +20,11 @@ static Module mod = {
 };
 
 static void
-give_op(Module *m, char **args, enum irc_type type)
+give_op(char **args, enum irc_type type)
 {
 	char buf[IRC_MSG_LEN];
+
+	(void) type;
 
 	sleep(2);
 	sprintf(buf, "Hello, %s! Welcome to %s, a socialist utopia. "

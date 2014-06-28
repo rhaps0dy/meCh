@@ -11,7 +11,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-static void do_fortune(Module *m, char **args, enum irc_type type);
+static void do_fortune(char **args, enum irc_type type);
 static char *mod_invokers[2] = {"fortune", NULL};
 
 static Module fortune = {
@@ -25,7 +25,7 @@ static Module fortune = {
 };
 
 static void
-do_fortune(Module *m, char **args, enum irc_type type)
+do_fortune(char **args, enum irc_type type)
 {
 	int fd[2];
 	int status, i;

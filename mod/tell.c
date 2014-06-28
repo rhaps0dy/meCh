@@ -10,7 +10,7 @@
 
 /* we want to be called even if no invoker is used */
 static char *mod_invokers[1] = {NULL};
-static void do_tell(Module *m, char **args, enum irc_type type);
+static void do_tell(char **args, enum irc_type type);
 
 static Module tell = {
 	"Tell",
@@ -68,7 +68,7 @@ get_msg(char *name)
 }
 
 static void
-do_tell(Module *m, char **args, enum irc_type type)
+do_tell(char **args, enum irc_type type)
 {
 	TellMsg *tmsg;
 	char buf[IRC_MSG_LEN];

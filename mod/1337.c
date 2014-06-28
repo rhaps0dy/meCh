@@ -6,7 +6,7 @@
 #include <string.h>
 
 static char *mod_invokers[2] = {"1337", NULL};
-static void elite(Module *m, char **args, enum irc_type type);
+static void elite(char **args, enum irc_type type);
 
 static Module leet = {
 	"1337",
@@ -18,20 +18,15 @@ static Module leet = {
 	NULL
 };
 
-enum {
-	N_CHARS = 'Z'-'a'+1,
-	INI_SIZE = 128;
-};
-
-static char *conv_tab[N_CHARS];
+static void
+elite(char **args, enum irc_type type)
+{
+	(void)args;
+	(void)type;
+}
 
 void
 mod_1337(void)
 {
 	mod_add(&leet);
-}
-
-static void
-elite(Module *m, char **args, enum irc_type type)
-{
 }

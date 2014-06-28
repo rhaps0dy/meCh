@@ -10,7 +10,7 @@
 #include <strings.h>
 
 static char *mod_invokers[1] = { NULL };
-static void do_seen(Module *m, char **args, enum irc_type type);
+static void do_seen(char **args, enum irc_type type);
 static Module lastseen = {
 	"LastSeen",
 	"core module for \"Seen\" and \"On\"",
@@ -48,9 +48,11 @@ ls_new(char *name)
 }
 
 static void
-do_seen(Module *m, char **args, enum irc_type type)
+do_seen(char **args, enum irc_type type)
 {
 	LastSeen *l;
+
+	(void) type;
 
 	l = ls_find(args[0]);
 	if(!l) l = ls_new(args[0]);

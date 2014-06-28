@@ -11,7 +11,7 @@
 #include <math.h>
 
 static char *mod_invokers[2] = {"on", NULL};
-static void tell_on(Module *m, char **args, enum irc_type type);
+static void tell_on(char **args, enum irc_type type);
 
 static Module on = {
 	"On",
@@ -39,7 +39,7 @@ proper_atoi(char *a)
 }
 
 static void
-tell_on(Module *m, char **args, enum irc_type type)
+tell_on(char **args, enum irc_type type)
 {
 	LastSeen *l;
 	char buf[IRC_MSG_LEN], notfirst = 0;

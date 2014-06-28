@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void help(Module *m, char **args, enum irc_type type);
+static void help(char **args, enum irc_type type);
 static char *mod_invokers[2] = {"help", NULL};
 
 static Module mod = {
@@ -30,10 +30,11 @@ enum {
 
 
 static void
-help(Module *m, char **args, enum irc_type type)
+help(char **args, enum irc_type type)
 {
 	char aux[IRC_MSG_LEN], buf[IRC_MSG_LEN], act;
 	unsigned int i, j, n, len, k;
+	Module *m = &mod;
 	/* i is the string index of the message we build. j is the string index of m->help.
 	n is the arg number on a $<n>. k is the length of <n> in chars*/
 
@@ -159,7 +160,7 @@ out:
 				*spaces[i] = '\0';
 			for(; i<nargs-2; i++)
 				*spaces[i] = ' ';
-			m->f(m, args, type);
+			m->f(args, type);
 		}
 		m = m->next;
 	} while(m);

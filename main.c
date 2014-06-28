@@ -6,6 +6,7 @@
 
 void handle_SIGINT(int sig)
 {
+	(void) sig;
 	puts("Exiting...");
 	irc_quit();
 }

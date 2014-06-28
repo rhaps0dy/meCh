@@ -12,7 +12,7 @@
 #include <math.h>
 
 static char *mod_invokers[2] = {"seen", NULL};
-static void tell_seen(Module *m, char **args, enum irc_type type);
+static void tell_seen(char **args, enum irc_type type);
 
 static Module seen = {
 	"Seen",
@@ -40,7 +40,7 @@ print_diff(char buf[64], double dt)
 }
 
 static void
-tell_seen(Module *m, char **args, enum irc_type type)
+tell_seen(char **args, enum irc_type type)
 {
 	LastSeen *l;
 	char buf[IRC_MSG_LEN], time_str[64];
