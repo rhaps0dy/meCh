@@ -3,6 +3,8 @@
 
 #include <signal.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 void handle_SIGINT(int sig)
 {
@@ -14,6 +16,7 @@ void handle_SIGINT(int sig)
 int
 main()
 {
+	srand(time(NULL));
 	irc_connect();
 	signal(SIGINT, handle_SIGINT);
 	mod_init();
