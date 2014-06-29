@@ -46,6 +46,7 @@ add_msg(char *sender, char *name, char *msg, char private)
 	strcpy(new->name, name);
 	strcpy(new->msg, msg);
 	new->private = private;
+	new->next = NULL;
 	last->next = new;
 	last = new;
 }
@@ -59,6 +60,8 @@ get_msg(char *name)
 	while(m) {
 		if(!strcasecmp(m->name, name)) {
 			prevm->next = m->next;
+			if(m == last)
+				last = prevm;
 			return m;
 		}
 		prevm = m;
@@ -80,7 +83,7 @@ do_tell(char **args, enum irc_type type)
 			snprintf(buf, IRC_MSG_LEN, "(%s) %s", tmsg->sender, tmsg->msg);
 			irc_msg(args[0], buf);
 		} else {
-			snprintf(buf, IRC_MSG_LEN, "%s: (%s) %s", args[0], tmsg->sender, tmsg->msg);
+			snprintf(buf, IRC_MSG_LEN, "%s: (%s) %s", tmsg->name, tmsg->sender, tmsg->msg);
 			irc_say(buf);
 		}
 		free(tmsg);
