@@ -163,6 +163,7 @@ irc_get_type(char msg[IRC_MSG_LEN])
 		if(msg[i+8]==conf.chan[0]) return T_CHAN;
 		return T_MSG;
 	}
+	if(strbeg(msg+i, "MODE ")) return T_MODE;
 	return T_OTHER;
 }
 
@@ -181,5 +182,23 @@ irc_get_text(char txt[IRC_MSG_LEN], char msg[IRC_MSG_LEN])
 	return;
 err:
 	txt[0] = '\0';
+	return;
+}
+
+void
+irc_get_mode_params(char params[IRC_MSG_LEN], char msg[IRC_MSG_LEN])
+{
+	int i, j;
+
+	for(i=1, j=0; j<0; j++)
+		for(; ; i++) {
+			if(i>=IRC_MSG_LEN) goto err;
+			if(msg[i]=='\0') goto err;
+			if(msg[i]==' ') break;
+		}
+	strcpy(params, msg+i);
+	return;
+err:
+	params[0] = '\0';
 	return;
 }

@@ -9,7 +9,8 @@ enum irc_type {
 	T_OTHER = 0, /* anything that doesn't fit the others */
 	T_JOIN = 1,  /* an user joins the channel */
 	T_CHAN = 2,  /* someone sends a message to the channel */
-	T_MSG = 4    /* someone sends meCh a private message */
+	T_MSG = 4,    /* someone sends meCh a private message */
+	T_MODE = 8   /* a channel or user mode is changed */
 };
 
 /* opens the connection with an IRC server to the
@@ -54,3 +55,5 @@ enum irc_type irc_get_type(char msg[IRC_MSG_LEN]);
 void irc_get_nick(char nick[IRC_NICK_LEN], char msg[IRC_MSG_LEN]);
 /* extracts the text from a message */
 void irc_get_text(char txt[IRC_MSG_LEN], char msg[IRC_MSG_LEN]);
+/* extracts the parameters from a mode message */
+void irc_get_mode_params(char params[IRC_MSG_LEN], char msg[IRC_MSG_LEN]);
