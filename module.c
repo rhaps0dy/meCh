@@ -183,4 +183,5 @@ mod_init(void)
 	mod_seen();
 	mod_on();
 	mod_1337();
+	mod_undeop();
 }

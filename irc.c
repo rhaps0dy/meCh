@@ -190,7 +190,7 @@ irc_get_mode_params(char params[IRC_MSG_LEN], char msg[IRC_MSG_LEN])
 {
 	int i, j;
 
-	for(i=1, j=0; j<0; j++)
+	for(i=1, j=0; j<3; j++, i++)
 		for(; ; i++) {
 			if(i>=IRC_MSG_LEN) goto err;
 			if(msg[i]=='\0') goto err;
@@ -201,4 +201,16 @@ irc_get_mode_params(char params[IRC_MSG_LEN], char msg[IRC_MSG_LEN])
 err:
 	params[0] = '\0';
 	return;
+}
+
+int
+irc_chan_modes(char *modes)
+{
+	int ms = M_C_OTHER;
+
+	while(*modes) {
+		if(*modes=='o') ms |= M_C_OP;
+		modes++;
+	}
+	return ms;
 }
