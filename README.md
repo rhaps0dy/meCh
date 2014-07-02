@@ -95,12 +95,12 @@ Examples:
 
 This is why if you want invokers, `nargs` must be greater or equal than 3.
 
-`<rhaps0dy>                  .exm   This      is a         test    phrase`
-- `nargs = 5`: `args = {"rhaps0dy", ".exm", "This", "is", "a         test    phrase"}`
-- `nargs = 4`: `args = {"rhaps0dy", ".exm", "This", "is a         test    phrase"}`
-- `nargs = 3`: `args = {"rhaps0dy", ".exm", "This      is a         test    phrase"}`
-- `nargs = 2`: `args = {"rhaps0dy", ".exm   This      is a         test    phrase"}`
-- `nargs = 1`: `args = {"rhaps0dy"}`
+``<rhaps0dy>                  .exm   This      is a         test    phrase``
+- `nargs = 5`: ``args = {"rhaps0dy", ".exm", "This", "is", "a         test    phrase"}``
+- `nargs = 4`: ``args = {"rhaps0dy", ".exm", "This", "is a         test    phrase"}``
+- `nargs = 3`: ``args = {"rhaps0dy", ".exm", "This      is a         test    phrase"}``
+- `nargs = 2`: ``args = {"rhaps0dy", ".exm   This      is a         test    phrase"}``
+- `nargs = 1`: ``args = {"rhaps0dy"}`
 
 The tokenizer also strips multiple spaces when separating arguments.
 
