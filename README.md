@@ -114,5 +114,5 @@ For a simple module without state, look at the "utopia" module in `mod/utopia.c`
  
 For a more complex module that keeps state and does different things depending on how it's invoked, look at the "tell" module in `mod/tell.c`
  
-For a composite module that has separate `Module` structs for keeping state and providing replise, look at the "seen", "lastseen" and "on" modules
+For a composite module that has separate `Module` structs for keeping state and providing replies, look at the "seen", "lastseen" and "on" modules
 in `mod/seen.c`, `mod/lastseen.c`, `mod/lastseen.h` and `mod/on.c`
