@@ -83,7 +83,7 @@ do_tell(char **args, enum irc_type type)
 			snprintf(buf, IRC_MSG_LEN, "(%s) %s", tmsg->sender, tmsg->msg);
 			irc_msg(args[0], buf);
 		} else {
-			snprintf(buf, IRC_MSG_LEN, "%s: (%s) %s", tmsg->name, tmsg->sender, tmsg->msg);
+			snprintf(buf, IRC_MSG_LEN, "%s: (%s) %s", args[0], tmsg->sender, tmsg->msg);
 			irc_say(buf);
 		}
 		free(tmsg);
