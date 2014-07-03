@@ -105,7 +105,7 @@ void
 mod_handle(char *msg)
 {
 	Module *m;
-	int i, nargs = 2, call_module;
+	int i, nargs = 2;
 	char nick[IRC_NICK_LEN];
 	char txt[IRC_MSG_LEN];
 	enum irc_type type;
@@ -124,50 +124,27 @@ mod_handle(char *msg)
 
 	args[0] = nick;
 
-	/* nargs cannot be smaller than 2, and the base "Help" module already
-	 * defines nargsrec=3, so this works. */
-	args[1] = msg = txt;
-	nargs = 1;
-	do {
-		nargs++;
-		for(; *msg==' '; msg++)
-			if(!*msg) goto out;
-		args[nargs-1] = msg;
-		for(; *msg!=' '; msg++)
-			if(!*msg) goto out;
-		spaces[nargs-2] = msg;
-	} while(nargs < nargsrec);
-out:
-	for(; *msg; msg++);
-	for(i=nargs; i<nargsrec; i++)
-		args[i] = msg;
-	if(nargs>2)
-		*spaces[0] = '\0';
+	nargs = 1 + words(txt, args+1, spaces, nargsrec-1);
 
 	m = &mod;
 	do {
-		call_module = 0;
+		unwords(spaces, nargs-1, m->nargs-1);
 		if(m->on & type) {
 			if(!m->invokers[0])
-				call_module = 1;
+				goto call;
 			for(i=0; m->invokers[i]; i++)
 				if(type==T_CHAN) {
 					if(args[1][0]==conf.cmd && !strcmp(args[1]+1, m->invokers[i]))
-						call_module = 1;
+						goto call;
 				} else {
 					if(!strcmp(args[1], m->invokers[i]))
-						call_module = 1;
+						goto call;
 				}
 		}
+		goto next;
 
-		if(call_module) {
-			for(i=0; i<nargs-2 && i<m->nargs-2; i++)
-				*spaces[i] = '\0';
-			for(; i<nargs-2; i++)
-				*spaces[i] = ' ';
-			m->f(args, type);
-		}
-		m = m->next;
+call:	m->f(args, type);
+next:	m = m->next;
 	} while(m);
 }
 

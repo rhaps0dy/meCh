@@ -17,3 +17,41 @@ strcat_msg(char *msg, char *s)
 	for(; i<IRC_MSG_LEN-1 && (msg[i]=*s); i++, s++);
 	msg[IRC_MSG_LEN-1] = '\0';
 }
+
+int
+words(char *str, char **wds, char **spaces, int maxwds)
+{
+	int nwds, i;
+
+	/* maxwds needs to be at least 1 */
+	if(maxwds<1) maxwds=1;
+
+	nwds = 0;
+	while(1) {
+		for(; *str==' '; str++)
+			if(!*str) goto out;
+		wds[nwds] = str;
+
+		nwds++;
+		if(nwds==maxwds) break;
+
+		for(; *str!=' '; str++)
+			if(!*str) goto out;
+		spaces[nwds-1] = str;
+	}
+out:
+	for(; *str; str++);
+	for(i=nwds; i<maxwds; i++)
+		wds[i] = str;
+	return nwds;
+}
+
+void
+unwords(char **spaces, int nwds, int targwds)
+{
+	int i;
+	for(i=0; i<nwds-1 && i<targwds-1; i++)
+		*spaces[i] = '\0';
+	for(; i<nwds-1; i++)
+		*spaces[i] = ' ';
+}
