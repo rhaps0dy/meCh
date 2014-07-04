@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 static void give_op(char **args, enum irc_type type);
 
@@ -25,7 +26,7 @@ give_op(char **args, enum irc_type type)
 
 	(void) type;
 
-	sleep(2);
+	if(!strcmp(args[0], conf.name)) return;
 	sprintf(buf, "Hello, %s! Welcome to %s, a socialist utopia. "
 		"Don't be a meanie!", args[0], conf.chan);
 	irc_say(buf);

@@ -15,7 +15,7 @@ static void tell_on(char **args, enum irc_type type);
 static Module on = {
 	"On",
 	".on <minutes> to see a list of the people who spoke in the last <minutes> minutes.",
-	"tell",
+	"on",
 	tell_on,
 	4,
 	T_CHAN|T_MSG,

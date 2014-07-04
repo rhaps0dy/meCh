@@ -44,3 +44,4 @@ void mod_seen(void);
 void mod_on(void);
 void mod_1337(void);
 void mod_undeop(void);
+void mod_autorejoin(void);

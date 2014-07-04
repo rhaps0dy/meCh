@@ -67,7 +67,6 @@ irc_connect(void)
 	puts("Connected!");
 	sprintf(buf, "Hello, I'm %s!", conf.name);
 	irc_say(buf);
-	while(irc_read(buf) && irc_get_type(buf)!=T_JOIN);
 }
 
 void
@@ -198,7 +197,6 @@ irc_get_params(char params[IRC_MSG_LEN], char msg[IRC_MSG_LEN])
 			if(msg[i]==' ') break;
 		}
 	strcpy(params, msg+i);
-	puts(params);
 	return;
 err:
 	params[0] = '\0';
