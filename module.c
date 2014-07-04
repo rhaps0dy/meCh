@@ -115,8 +115,8 @@ mod_handle(char *msg)
 	if(type==T_OTHER) return;
 
 	irc_get_nick(nick, msg);
-	if(type==T_MODE)
-		irc_get_mode_params(txt, msg);
+	if(type & (T_MODE|T_KICK))
+		irc_get_params(txt, msg);
 	else
 		irc_get_text(txt, msg);
 

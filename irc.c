@@ -164,6 +164,7 @@ irc_get_type(char msg[IRC_MSG_LEN])
 		return T_MSG;
 	}
 	if(strbeg(msg+i, "MODE ")) return T_MODE;
+	if(strbeg(msg+i, "KICK ")) return T_KICK;
 	return T_OTHER;
 }
 
@@ -186,7 +187,7 @@ err:
 }
 
 void
-irc_get_mode_params(char params[IRC_MSG_LEN], char msg[IRC_MSG_LEN])
+irc_get_params(char params[IRC_MSG_LEN], char msg[IRC_MSG_LEN])
 {
 	int i, j;
 
@@ -197,6 +198,7 @@ irc_get_mode_params(char params[IRC_MSG_LEN], char msg[IRC_MSG_LEN])
 			if(msg[i]==' ') break;
 		}
 	strcpy(params, msg+i);
+	puts(params);
 	return;
 err:
 	params[0] = '\0';

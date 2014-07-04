@@ -9,8 +9,9 @@ enum irc_type {
 	T_OTHER = 0, /* anything that doesn't fit the others */
 	T_JOIN = 1,  /* an user joins the channel */
 	T_CHAN = 2,  /* someone sends a message to the channel */
-	T_MSG = 4,    /* someone sends meCh a private message */
-	T_MODE = 8   /* a channel or user mode is changed */
+	T_MSG = 4,   /* someone sends meCh a private message */
+	T_MODE = 8,  /* a channel or user mode is changed */
+	T_KICK = 16  /* a user is kicked from the channel */
 };
 
 enum irc_chan_mode {
@@ -60,7 +61,7 @@ enum irc_type irc_get_type(char msg[IRC_MSG_LEN]);
 void irc_get_nick(char nick[IRC_NICK_LEN], char msg[IRC_MSG_LEN]);
 /* extracts the text from a message */
 void irc_get_text(char txt[IRC_MSG_LEN], char msg[IRC_MSG_LEN]);
-/* extracts the parameters from a mode message */
-void irc_get_mode_params(char params[IRC_MSG_LEN], char msg[IRC_MSG_LEN]);
+/* extracts the parameters from a mode or kick message */
+void irc_get_params(char params[IRC_MSG_LEN], char msg[IRC_MSG_LEN]);
 /* extracts the modes in that mode altering string */
 int irc_chan_modes(char *modes);
