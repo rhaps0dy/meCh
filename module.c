@@ -125,7 +125,7 @@ mod_handle(char *msg)
 		if((m->on & type) && (
 			(!m->invoker) ||
 			(type==T_CHAN && args[1][0]==conf.cmd && !strcmp(args[1]+1, m->invoker)) ||
-			(!strcmp(args[1], m->invoker))
+			(type!=T_CHAN && !strcmp(args[1], m->invoker))
 			)
 		) m->f(args, type);
 
