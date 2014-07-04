@@ -10,13 +10,12 @@
 #include <string.h>
 #include <math.h>
 
-static char *mod_invokers[2] = {"on", NULL};
 static void tell_on(char **args, enum irc_type type);
 
 static Module on = {
 	"On",
 	".on <minutes> to see a list of the people who spoke in the last <minutes> minutes.",
-	mod_invokers,
+	"tell",
 	tell_on,
 	4,
 	T_CHAN|T_MSG,

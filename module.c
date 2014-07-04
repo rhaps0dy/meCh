@@ -8,12 +8,11 @@
 #include <string.h>
 
 static void help(char **args, enum irc_type type);
-static char *mod_invokers[2] = {"help", NULL};
 
 static Module mod = {
 	"Help",
 	"$0 to read this help.",
-	mod_invokers,
+	"help",
 	help,
 	3,
 	T_MSG|T_CHAN,
@@ -24,6 +23,8 @@ static Module mod = {
 static int nargsrec;
 
 /* maximum number of arguments allowed for a module */
+static char S0_string[128];
+static int S0_base_len;
 enum {
 	MAX_NARGS = 5
 };
@@ -32,11 +33,10 @@ enum {
 static void
 help(char **args, enum irc_type type)
 {
-	char aux[IRC_MSG_LEN], buf[IRC_MSG_LEN], act;
-	unsigned int i, j, n, len, k;
+	char buf[IRC_MSG_LEN], act;
+	int i, j, with_S0_total_len;
 	Module *m = &mod;
-	/* i is the string index of the message we build. j is the string index of m->help.
-	n is the arg number on a $<n>. k is the length of <n> in chars*/
+	/* i is the string index of the message we build. j is the string index of m->help. */
 
 	if(type==T_CHAN) {
 		sprintf(buf, "%s: I'll send you the help in a private message.", args[0]);
@@ -44,35 +44,29 @@ help(char **args, enum irc_type type)
 	}
 
 	do {
-		for(i=0; i<IRC_MSG_LEN && (buf[i]=m->name[i]); i++);
+		for(i=0; i<IRC_MSG_LEN-2 && (buf[i]=m->name[i]); i++);
 		buf[i] = ':';
 		i++;
 		buf[i] = ' ';
 		i++;
-		j=0;
-		if(m->help)
-			for(; j+i<IRC_MSG_LEN-1 && (act=m->help[j]); j++) {
-				if(act!='$') {
-					buf[j+i] = act;
-					continue;
-				}
-				n = 0;
-				k = 0;
-				for(j++; (act=m->help[j]) && (m->help[j]>='0' && m->help[j]<='9'); j++, k++)
-					n = n*10 + (act-'0');
-				j--;
-				if(!act) break;
-				sprintf(aux, "[\"/msg %s %s\" | \"%c%s\"]", conf.name,
-					m->invokers[n], conf.cmd, m->invokers[n]);
-				len = strlen(aux);
-				if(j+i+len-k < IRC_MSG_LEN-1) {
-					strcpy(buf+j+i-k, aux);
-					i += len-k-1;
-				}
+		for(j=0; i<IRC_MSG_LEN && (act=m->help[j]); j++, i++) {
+			if(act!='$') {
+				buf[i] = act;
+				continue;
 			}
-		if(j+i >= IRC_MSG_LEN)
-			i = IRC_MSG_LEN-1;
-		else i = i+j;
+			j++;
+			if(!(act=m->help[j]) || act!='0') break;
+			if(!m->invoker) {
+				printf("Module %s doesn't have an invoker, cannot use $0 in help!\n", m->name);
+				exit(EXIT_FAILURE);
+			}
+			with_S0_total_len = i + S0_base_len + 2*strlen(m->invoker);
+
+			if(with_S0_total_len < IRC_MSG_LEN) {
+				sprintf(buf+i, S0_string, m->invoker, m->invoker);
+				i = with_S0_total_len-1;
+			}
+		}
 		buf[i] = '\0';
 		irc_msg(args[0], buf);
 		m = m->next;
@@ -83,8 +77,8 @@ void mod_add(Module *m)
 {
 	m->next = mod.next;
 	mod.next = m;
-	if(*m->invokers && m->nargs<3) {
-		puts("ALERT: MODULE WITH INVOKERS AND < 3 ARGUMENTS");
+	if(m->invoker && m->nargs<3) {
+		puts("ALERT: MODULE WITH INVOKER AND < 3 ARGUMENTS");
 		goto err;
 	}
 	if(m->nargs > nargsrec) nargsrec = m->nargs;
@@ -98,18 +92,17 @@ void mod_add(Module *m)
 err:
 	printf("Offending module: \"%s\"\n", m->name);
 	puts("Aborting...");
-	exit(1);
+	exit(EXIT_FAILURE);
 }
 
 void
 mod_handle(char *msg)
 {
 	Module *m;
-	int i, nargs = 2;
-	char nick[IRC_NICK_LEN];
-	char txt[IRC_MSG_LEN];
+	int nargs;
+	char nick[IRC_NICK_LEN], txt[IRC_MSG_LEN],
+		*args[MAX_NARGS], *spaces[MAX_NARGS-2];
 	enum irc_type type;
-	char *args[MAX_NARGS], *spaces[MAX_NARGS-2];
 
 	type = irc_get_type(msg);
 	if(type==T_OTHER) return;
@@ -129,22 +122,14 @@ mod_handle(char *msg)
 	m = &mod;
 	do {
 		unwords(spaces, nargs-1, m->nargs-1);
-		if(m->on & type) {
-			if(!m->invokers[0])
-				goto call;
-			for(i=0; m->invokers[i]; i++)
-				if(type==T_CHAN) {
-					if(args[1][0]==conf.cmd && !strcmp(args[1]+1, m->invokers[i]))
-						goto call;
-				} else {
-					if(!strcmp(args[1], m->invokers[i]))
-						goto call;
-				}
-		}
-		goto next;
+		if((m->on & type) && (
+			(!m->invoker) ||
+			(type==T_CHAN && args[1][0]==conf.cmd && !strcmp(args[1]+1, m->invoker)) ||
+			(!strcmp(args[1], m->invoker))
+			)
+		) m->f(args, type);
 
-call:	m->f(args, type);
-next:	m = m->next;
+	m = m->next;
 	} while(m);
 }
 
@@ -152,6 +137,9 @@ void
 mod_init(void)
 {
 	nargsrec = mod.nargs;
+
+	snprintf(S0_string, 128, "[\"/msg %s %%s\" | \"%c%%s\"]", conf.name, conf.cmd);
+	S0_base_len = strlen(S0_string)-2*2;
 
 	/* Register modules here */
 	mod_utopia();

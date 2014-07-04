@@ -8,15 +8,13 @@
 #include <string.h>
 #include <strings.h>
 
-/* we want to be called even if no invoker is used */
-static char *mod_invokers[1] = {NULL};
 static void do_tell(char **args, enum irc_type type);
 
 static Module tell = {
 	"Tell",
 	".tell <nick> <message> to leave message <message> for <nick>. If you tell that "
 	"to the bot privately, it will send the message in private.",
-	mod_invokers,
+	NULL,
 	do_tell,
 	4,
 	T_JOIN|T_CHAN|T_MSG,

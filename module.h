@@ -6,10 +6,9 @@
 /*Module
 modules should use exactly the number of arguments they list in nargs.
 If they want to use the invokers, they should have nargs>=3.
-invokers are strings that make the module be ran, if they are typed as
-/msg <conf.name> <invoker> or <conf.cmd><invoker>. The invokers array
-must finish with a NULL, if the NULL is the only value in it the module
-is ran always.
+invoker is a string that makes the module be run, if they are typed as
+/msg <conf.name> <invoker> or <conf.cmd><invoker>. If the invoker is NULL
+the module is always called.
 you can use $<number> in the help to insert
 ["/msg <conf.name> <invoker>" | "<conf.cmd><invoker>"] in the help text.
 To print "$" use "$$"*/
@@ -17,7 +16,7 @@ typedef struct Module Module;
 struct Module {
 	char *name;         /* module name */
 	char *help;         /* help text */
-	char **invokers;    /* 'command' strings that invoke the module */
+	char *invoker;    /* 'command' string that invokes the module. if NULL module is always called */
 /* module function. Takes an array of strings:
  * the first one is the nick and then come the arguments, as many args+nick
  * as specified in 'nargs' and then the rest of the message; and finally

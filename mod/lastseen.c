@@ -9,12 +9,11 @@
 #include <string.h>
 #include <strings.h>
 
-static char *mod_invokers[1] = { NULL };
 static void do_seen(char **args, enum irc_type type);
 static Module lastseen = {
 	"LastSeen",
 	"core module for \"Seen\" and \"On\"",
-	mod_invokers,
+	NULL,
 	do_seen,
 	2,
 	T_CHAN|T_MSG,

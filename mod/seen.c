@@ -11,13 +11,12 @@
 #include <strings.h>
 #include <math.h>
 
-static char *mod_invokers[2] = {"seen", NULL};
 static void tell_seen(char **args, enum irc_type type);
 
 static Module seen = {
 	"Seen",
 	".seen <nick> to see last time <nick> spoke, and what was said.",
-	mod_invokers,
+	"seen",
 	tell_seen,
 	4,
 	T_CHAN|T_MSG,

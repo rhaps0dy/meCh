@@ -12,12 +12,11 @@
 #include <sys/wait.h>
 
 static void do_fortune(char **args, enum irc_type type);
-static char *mod_invokers[2] = {"fortune", NULL};
 
 static Module fortune = {
 	"Fortune",
 	"$0 to know your fortune",
-	mod_invokers,
+	"fortune",
 	do_fortune,
 	3,
 	T_CHAN|T_MSG,

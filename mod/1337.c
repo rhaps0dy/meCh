@@ -7,13 +7,12 @@
 
 #define FILENAME_1337 "mod/1337/conv.1337"
 
-static char *mod_invokers[2] = {"1337", NULL};
 static void do_1337(char **args, enum irc_type type);
 
 static Module leet = {
 	"1337",
 	"$0 t0 m4k3 y0ur m3ssag3 b3c0m3 1337.",
-	mod_invokers,
+	"1337",
 	do_1337,
 	3,
 	T_CHAN|T_MSG,

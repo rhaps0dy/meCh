@@ -6,13 +6,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-static char *mod_invokers[1] = {NULL};
 static void give_op(char **args, enum irc_type type);
 
 static Module mod = {
 	"Utopia",
 	"this is a socialist utopia. Don't be a meanie!",
-	mod_invokers,
+	NULL,
 	give_op,
 	1,
 	T_JOIN,
