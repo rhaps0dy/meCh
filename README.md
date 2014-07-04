@@ -93,7 +93,7 @@ Examples:
 This is why if you want invokers, `nargs` must be greater or equal than 3.
 
 **NOTE**: for some reason Markdown ignores multiple spaces, so underscores are spaces
-in this example.
+in the following example.
 
 ``<rhaps0dy>__________________.exm___This______is_a_________test____phrase``
 - `nargs = 5`: ``args = {"rhaps0dy", ".exm", "This", "is", "a_________test____phrase"}``
