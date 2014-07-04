@@ -25,7 +25,7 @@ called.
 struct Module {
 	char *name;
 	char *help;
-	char **invokers;
+	char *invoker;
 	void (*f)(char**, enum irc_type);
 	int nargs;
 	int on;
@@ -38,10 +38,9 @@ struct Module {
 - `help`: the help string of the module, you can use `$<n` to write 
   `["/msg meCh <invokern>" | "<conf.cmd><invokern>"]`,
   for example a `$0` in `help` becomes `["/msg meCh help" | ".help"]`
-- `invokers`: the command strings upon which the module is called. The last element
-  in this array must be a `NULL` pointer. Modules specifying at least one non-`NULL` invoker
-  must accept at least 3 arguments. A module with only a `NULL` invoker will always be called
-  and has no restriction on the number of accepted arguments
+- `invokers`: the command string upon which the module is called. If it is `NULL`,
+  the module will always be called (if its mask (`on`) allows it). Modules specifying an invoker must accept at least 3 arguments.
+  A module with `NULL` invoker has no restriction on the number of accepted arguments
 - `f`: the function called to execute the module. It receives an array of string arguments, as many
   as specified by nargs, and the type of the message that made the module activate.
 - `nargs`: number of arguments (words) the module wants, if the message contains less, the last arguments will be
@@ -53,12 +52,10 @@ struct Module {
 
 ```c
 void example_function(char **args, enum irc_type type);
-static char *inv_example[2] = {"exm", NULL};
-static char *always[1] = {NULL};
 static Module example = {
 	"Example",
 	"$0 to do an example.",
-	inv_example,
+	"exm",
 	example_function,
 	3,
 	T_MSG|T_CHAN,
@@ -72,7 +69,7 @@ In this example, the module will be called provided the following conditions:
   the bot, or the first word is ".exm" if the message is a message to the channel. The "." in
   ".exm" is configured with the conf.cmd value in the global configuration.
 
-If `example.invokers` was `always`, the module would always be called by the handler, if the received message
+If `example.invoker` was `NULL`, the module would always be called by the handler, if the received message
 fitted in the `example.on` mask.
 
 Also, the help about this module will send via private message `Example: ["/msg meCh exm" | ".exm"] to do an example.`
@@ -95,11 +92,14 @@ Examples:
 
 This is why if you want invokers, `nargs` must be greater or equal than 3.
 
-``<rhaps0dy>                  .exm   This      is a         test    phrase``
-- `nargs = 5`: ``args = {"rhaps0dy", ".exm", "This", "is", "a         test    phrase"}``
-- `nargs = 4`: ``args = {"rhaps0dy", ".exm", "This", "is a         test    phrase"}``
-- `nargs = 3`: ``args = {"rhaps0dy", ".exm", "This      is a         test    phrase"}``
-- `nargs = 2`: ``args = {"rhaps0dy", ".exm   This      is a         test    phrase"}``
+**NOTE**: for some reason Markdown ignores multiple spaces, so underscores are spaces
+in this example.
+
+``<rhaps0dy>__________________.exm___This______is_a_________test____phrase``
+- `nargs = 5`: ``args = {"rhaps0dy", ".exm", "This", "is", "a_________test____phrase"}``
+- `nargs = 4`: ``args = {"rhaps0dy", ".exm", "This", "is_a_________test____phrase"}``
+- `nargs = 3`: ``args = {"rhaps0dy", ".exm", "This______is_a_________test____phrase"}``
+- `nargs = 2`: ``args = {"rhaps0dy", ".exm___This______is_a_________test____phrase"}``
 - `nargs = 1`: ``args = {"rhaps0dy"}`
 
 The tokenizer also strips multiple spaces when separating arguments.
