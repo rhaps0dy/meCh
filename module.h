@@ -2,7 +2,6 @@
 "irc.h"
 */
 
-
 /*Module
 modules should use exactly the number of arguments they list in nargs.
 If they want to use the invokers, they should have nargs>=3.
@@ -29,6 +28,11 @@ struct Module {
 	Module *next;       /* next module in the linked list */
 };
 
+/* maximum number of arguments allowed for a module */
+enum {
+	MAX_NARGS = 5
+};
+
 /* Init the starting module */
 void mod_init(void);
 /* Add a module to the chain */
@@ -45,3 +49,4 @@ void mod_on(void);
 void mod_1337(void);
 void mod_undeop(void);
 void mod_autorejoin(void);
+void mod_ftp_password(void);

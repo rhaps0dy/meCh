@@ -22,13 +22,9 @@ static Module mod = {
 /* record for number of arguments */
 static int nargsrec;
 
-/* maximum number of arguments allowed for a module */
+/* string to be used as formatter for the $0 special token in the help module */
 static char S0_string[128];
 static int S0_base_len;
-enum {
-	MAX_NARGS = 5
-};
-
 
 static void
 help(char **args, enum irc_type type)
@@ -150,4 +146,5 @@ mod_init(void)
 	mod_1337();
 	mod_undeop();
 	mod_autorejoin();
+	mod_ftp_password();
 }
