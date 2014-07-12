@@ -55,3 +55,16 @@ unwords(char **spaces, int nwds, int targwds)
 	for(; i<nwds-1; i++)
 		*spaces[i] = ' ';
 }
+
+
+int
+proper_atoi(char *a)
+{
+	int i = 0;
+	for(; *a; a++)
+		if(*a<'0' || *a>'9')
+			return -1;
+		else
+			i = i*10 + (*a-'0');
+	return i;
+}

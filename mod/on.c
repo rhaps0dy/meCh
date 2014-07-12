@@ -25,18 +25,6 @@ static Module on = {
 /* TODO: make config file */
 #define DEFAULT_MINUTES 10
 
-static int
-proper_atoi(char *a)
-{
-	int i = 0;
-	for(; *a; a++)
-		if(*a<'0' || *a>'9')
-			return -1;
-		else
-			i = i*10 + (*a-'0');
-	return i;
-}
-
 static void
 tell_on(char **args, enum irc_type type)
 {
