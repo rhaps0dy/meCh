@@ -23,3 +23,9 @@ void unwords(char **spaces, int nwds, int targwds);
 /* converts a string containing characters [0-9] to a positive integer.
 If the string contains characters other than those, it returns -1 */
 int proper_atoi(char *a);
+
+#define CHECK_MALLOC(p) \
+	if(!p) { \
+		fprintf(stderr, "Could not allocate memory on line %d, file %s.\n", __LINE__, __FILE__); \
+		exit(1); \
+	}

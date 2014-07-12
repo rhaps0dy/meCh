@@ -3,6 +3,7 @@
 #include "lastseen.h"
 
 #include "../module.h"
+#include "../utils.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,6 +41,7 @@ ls_new(char *name)
 {
 	LastSeen *l;
 	l = (LastSeen *) malloc(sizeof(LastSeen));
+	CHECK_MALLOC(l)
 	strcpy(l->name, name);
 	l->next = base.next;
 	base.next = l;

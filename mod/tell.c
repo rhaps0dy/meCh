@@ -40,6 +40,7 @@ add_msg(char *sender, char *name, char *msg, char private)
 	TellMsg *new;
 
 	new = (TellMsg *) malloc(sizeof(TellMsg));
+	CHECK_MALLOC(new)
 	strcpy(new->sender, sender);
 	strcpy(new->name, name);
 	strcpy(new->msg, msg);

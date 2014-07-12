@@ -172,6 +172,7 @@ mod_1337(void)
 	}
 
 	act = conv_buf = (char *) malloc(nchars*sizeof(char));
+	CHECK_MALLOC(conv_buf)
 	atexit(conv_buf_free);
 	rewind(f);
 
