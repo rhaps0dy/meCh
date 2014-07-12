@@ -23,7 +23,7 @@ restore_op(char **args, enum irc_type type)
 
 	(void) type;
 
-	if(args[1][0]=='-' && M_C_OP|irc_chan_modes(args[1])) {
+	if(args[1][0]=='-' && M_C_OP&irc_chan_modes(args[1])) {
 		irc_reply(args[0], "Meanie!", T_CHAN);
 		sprintf(buf, "MODE %s +o %s", conf.chan, args[2]);
 		irc_cmd(buf);
