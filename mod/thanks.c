@@ -9,6 +9,16 @@
 
 static void thank(char **args, enum irc_type type);
 
+static Module mod = {
+        "thank",
+        "I don't know what should be here",
+        NULL,
+        thank,
+        1,
+        T_MODE,
+        NULL
+};
+
 static void
 thank(char **args, enum irc_type type)
 {
