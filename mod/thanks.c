@@ -11,7 +11,7 @@ static void thank(char **args, enum irc_type type);
 
 static Module mod = {
         "thank",
-        "I don't know what should be here",
+        "Says thanks to anyone who gives bot op",
         NULL,
         thank,
         1,
@@ -26,9 +26,9 @@ thank(char **args, enum irc_type type)
 
         (void) type;
 
-        if(strcmp("mode/#2d [+o meCh] by *", input)) return;
-        sprintf(buf, "Thank you");
-        irc_say(buf);
+        if(args[1][0]=='-' && M_C_OP|irc_chan_modes(args[1])) {
+                irc_reply(args[0], "thank you!", T_CHAN);
+        }
 }
 
 void
