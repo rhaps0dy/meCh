@@ -62,6 +62,8 @@ irc_connect(void)
 		buf[strlen(conf.name)+1] = '\0';
 		if(!strcmp(buf+1, conf.name)) break;
 	}
+	sprintf(buf, "identify %s", conf.password);
+	irc_msg("NickServ", buf);
 	sprintf(buf, "JOIN %s", conf.chan);
 	irc_cmd(buf);
 	puts("Connected!");
