@@ -19,3 +19,7 @@ int words(char *str, char **wds, char **spaces, int maxwds);
  * nwds is the number of words the string has
  * targwds is the number of desired words. */
 void unwords(char **spaces, int nwds, int targwds);
+
+/* converts a string containing characters [0-9] to a positive integer.
+If the string contains characters other than those, it returns -1 */
+int proper_atoi(char *a);
