@@ -150,4 +150,6 @@ mod_init(void)
 	mod_1337();
 	mod_undeop();
 	mod_autorejoin();
+	mod_ftp_password();
+	mod_sed();
 }
