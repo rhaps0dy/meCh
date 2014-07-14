@@ -26,7 +26,7 @@ thank(char **args, enum irc_type type)
 
         (void) type;
 
-        if(args[1][0]=='-' && M_C_OP|irc_chan_modes(args[1])) {
+        if(args[1][0]=='+' && M_C_OP|irc_chan_modes(args[1])) {
                 irc_reply(args[0], "thank you!", T_CHAN);
         }
 }
