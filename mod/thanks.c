@@ -22,7 +22,6 @@ static Module mod = {
 static void
 thank(char **args, enum irc_type type)
 {
-        char buf[IRC_MSG_LEN];
 
         (void) type;
 
