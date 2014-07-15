@@ -138,6 +138,7 @@ mod_init(void)
 	S0_base_len = strlen(S0_string)-2*2;
 
 	/* Register modules here */
+	mod_thanks();
 	mod_utopia();
 	mod_tell();
 	mod_fortune();
