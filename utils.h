@@ -24,8 +24,12 @@ void unwords(char **spaces, int nwds, int targwds);
 If the string contains characters other than those, it returns -1 */
 int proper_atoi(char *a);
 
-#define CHECK_MALLOC(p) \
-	if(!p) { \
-		fprintf(stderr, "Could not allocate memory on line %d, file %s.\n", __LINE__, __FILE__); \
-		exit(1); \
-	}
+#define ERROR_EXIT(msg) do { \
+	fprintf(stderr, msg " on line %d, file %s.\n", __LINE__, __FILE__); \
+	exit(1); \
+} while(0)
+
+#define CHECK_MALLOC(p) do { \
+	if(!p) \
+		ERROR_EXIT("Could not allocate memory"); \
+} while(0)

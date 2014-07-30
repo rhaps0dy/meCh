@@ -105,7 +105,8 @@ irc_cmd(char msg[IRC_MSG_LEN])
 	for(i=0; i<IRC_MSG_LEN-2 && msg[i]; i++);
 	msg[i] = '\r'; i++;
 	msg[i] = '\n'; i++;
-	write(fd, msg, i);
+	if(write(fd, msg, i) == -1)
+		ERROR_EXIT("Could not write to socket");
 }
 
 unsigned int

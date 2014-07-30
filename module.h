@@ -41,13 +41,10 @@ void mod_add(Module *m);
 void mod_handle(char *msg);
 
 /* Register modules here */
-void mod_thanks(void);
-void mod_utopia(void);
+void mod_voice(void);
 void mod_tell(void);
 void mod_fortune(void);
 void mod_seen(void);
 void mod_on(void);
 void mod_1337(void);
-void mod_undeop(void);
 void mod_autorejoin(void);
-void mod_ftp_password(void);

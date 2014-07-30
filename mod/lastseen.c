@@ -41,7 +41,7 @@ ls_new(char *name)
 {
 	LastSeen *l;
 	l = (LastSeen *) malloc(sizeof(LastSeen));
-	CHECK_MALLOC(l)
+	CHECK_MALLOC(l);
 	strcpy(l->name, name);
 	l->next = base.next;
 	base.next = l;

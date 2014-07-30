@@ -104,12 +104,14 @@ mod_handle(char *msg)
 	if(type==T_OTHER) return;
 
 	irc_get_nick(nick, msg);
+	if(!strcmp(nick, conf.name)) return;
 	if(type & (T_MODE|T_KICK))
 		irc_get_params(txt, msg);
 	else
 		irc_get_text(txt, msg);
 
-	msg[0] = '\0'; /* mark message as copied */
+	/* mark message as copied, maybe useful if the bot is made multithreaded */
+	msg[0] = '\0';
 
 	args[0] = nick;
 
@@ -138,14 +140,11 @@ mod_init(void)
 	S0_base_len = strlen(S0_string)-2*2;
 
 	/* Register modules here */
-	mod_thanks();
-	mod_utopia();
+	mod_voice();
 	mod_tell();
 	mod_fortune();
 	mod_seen();
 	mod_on();
 	mod_1337();
-	mod_undeop();
 	mod_autorejoin();
-	mod_ftp_password();
 }

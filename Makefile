@@ -5,7 +5,7 @@ LDFLAGS=
 LIBS=-lm
 
 MODDIR = mod
-_MODOBJ = thanks.o utopia.o tell.o seen.o lastseen.o on.o fortune.o 1337.o undeop.o autorejoin.o ftppass.o
+_MODOBJ = voice.o tell.o seen.o lastseen.o on.o fortune.o 1337.o autorejoin.o
 MODOBJ = $(patsubst %,$(MODDIR)/%,$(_MODOBJ))
 
 DEPS = irc.h config.h module.h utils.h
@@ -20,7 +20,7 @@ $(MODDIR)/%.o: $(MODDIR)/%.c $(DEPS)
 	$(CC) -c -o $@ $(CFLAGS) $<
 
 all: $(OBJ) $(MODOBJ) $(MAIN)
-	$(CC) -o $(NAME) $(LDFLAGS) $(LIBS) $(OBJ) $(MODOBJ) $(MAIN)
+	$(CC) -o $(NAME) $(LDFLAGS) $(OBJ) $(MODOBJ) $(MAIN) $(LIBS)
 
 clean:
 	rm *.o

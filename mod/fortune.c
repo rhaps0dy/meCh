@@ -30,7 +30,11 @@ do_fortune(char **args, enum irc_type type)
 	int status, i;
 	char buf[IRC_MSG_LEN];
 
-	pipe(fd);
+	if(pipe(fd) == -1) {
+		sprintf(buf, "Opening pipe to fortune(6) failed, contact %s.", conf.owner);
+		irc_reply(args[0], buf, type);
+		return;
+	}
 	if(!fork()) {
 		dup2(fd[1], 1);
 		close(fd[0]);

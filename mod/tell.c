@@ -17,7 +17,7 @@ static Module tell = {
 	NULL,
 	do_tell,
 	4,
-	T_JOIN|T_CHAN|T_MSG,
+	T_CHAN|T_MSG,
 	NULL
 };
 
@@ -40,7 +40,7 @@ add_msg(char *sender, char *name, char *msg, char private)
 	TellMsg *new;
 
 	new = (TellMsg *) malloc(sizeof(TellMsg));
-	CHECK_MALLOC(new)
+	CHECK_MALLOC(new);
 	strcpy(new->sender, sender);
 	strcpy(new->name, name);
 	strcpy(new->msg, msg);
