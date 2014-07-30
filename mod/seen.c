@@ -26,15 +26,18 @@ static Module seen = {
 static void
 print_diff(char buf[64], double dt)
 {
+	double days;
+
 	if(dt<60.)
 		sprintf(buf, "%.0f seconds", dt);
 	else if(dt<3600.)
 		sprintf(buf, "%.0f minutes", dt/60.);
 	else if(dt<3600.*24.)
 		sprintf(buf, "%.0f hours", dt/3600.);
-	else if(dt<3600.*24.*7.)
-		sprintf(buf, "%.0f days %.0f hours", dt/(3600.*24.), (dt-floor(dt/(3600.*24.)))/3600.);
-	else
+	else if(dt<3600.*24.*7.) {
+		days = floor(dt/(3600.*24.));
+		sprintf(buf, "%.0f days %.0f hours", days, floor(dt/3600.) - days*24.);
+	} else
 		sprintf(buf, "%.0f days", dt/(3600.*24.));
 }
 
