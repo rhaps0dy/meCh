@@ -15,7 +15,8 @@ struct LastSeen {
 /* start of the chain */
 extern LastSeen base;
 
-/* find a LastSeen in the chain with the given name */
+/* find a LastSeen in the chain with the given name
+ * If none is found, return NULL */
 LastSeen *ls_find(char *name);
 
 /* use this to add the module */

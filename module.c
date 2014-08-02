@@ -147,4 +147,5 @@ mod_init(void)
 	mod_on();
 	mod_1337();
 	mod_autorejoin();
+	mod_sed();
 }
