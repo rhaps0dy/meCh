@@ -91,7 +91,7 @@ mod_function(char **args, enum irc_type type)
 
 	(void) type;
 
-	if(!strbeg(args[1], "s/")) return;
+	if(args[1][0] != 's' || args[1][1] != '/') return;
 	ls = ls_find(args[0]);
 	if(!ls) {
 		irc_reply(args[0], "You have never said anything!", T_CHAN);

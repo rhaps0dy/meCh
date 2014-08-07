@@ -60,11 +60,14 @@ unwords(char **spaces, int nwds, int targwds)
 int
 proper_atoi(char *a)
 {
-	int i = 0;
-	for(; *a; a++)
+	int i=0, previ=0;
+	for(; *a; a++) {
 		if(*a<'0' || *a>'9')
 			return -1;
-		else
-			i = i*10 + (*a-'0');
+		i = i*10 + (*a-'0');
+		if(i < previ)
+			return -2;
+		previ = i;
+	}
 	return i;
 }

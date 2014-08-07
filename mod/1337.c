@@ -66,24 +66,6 @@ rand_dont_convert_this_char(int prob)
 }
 
 static void
-print_char_translation(char c)
-{
-	int i, j;
-	char *act;
-
-	i = conv_ind(c);
-	printf("%c: ", c);
-	act = conv_tab[i].beg;
-	printf("%d ", conv_tab[i].n);
-	for(j=0; j<conv_tab[i].n; j++) {
-		printf("%s, ", act);
-		while(*act) act++;
-		act++;
-	}
-	putchar('\n');
-}
-
-static void
 do_1337(char **args, enum irc_type type)
 {
 	char *str, *c, buf[IRC_MSG_LEN];
@@ -98,7 +80,7 @@ do_1337(char **args, enum irc_type type)
 		*num_end = '\0';
 		prob = proper_atoi(num_start[0]+1);
 		*num_end = ' ';
-		if(prob==-1)
+		if(prob < 0)
 			goto usage;
 		str = num_start[1];
 	} else {
@@ -192,10 +174,6 @@ mod_1337(void)
 		}
 		if(getc(f)!='\n' && !feof(f)) goto err;
 	}
-	for(c='a'; c<='z'; c++)
-		print_char_translation(c);
-	for(c='A'; c<='Z'; c++)
-		print_char_translation(c);
 
 	fclose(f);
 	mod_add(&leet);

@@ -36,8 +36,11 @@ tell_on(char **args, enum irc_type type)
 
 	if(*args[2]) {
 		minutes = proper_atoi(args[2]);
-		if(minutes<0) {
+		if(minutes == -1) {
 			strcpy(buf, "Usage: .on [minutes]");
+			goto say;
+		} else if(minutes == -2) {
+			strcpy(buf, "No, you won't overflow buffers with a big minutes number. You'll just cause your query to not work.");
 			goto say;
 		}
 
