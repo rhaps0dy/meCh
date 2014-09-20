@@ -41,7 +41,7 @@ void mod_add(Module *m);
 void mod_handle(char *msg);
 
 /* Register modules here */
-void mod_voice(void);
+void mod_utopia(void);
 void mod_tell(void);
 void mod_fortune(void);
 void mod_seen(void);
