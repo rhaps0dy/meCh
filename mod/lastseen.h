@@ -3,11 +3,18 @@
 "../irc.h"
 */
 
-/* We'll use a linked list for storing times and last utterances. O(n) is okay */
+/* Number of messages stored in a LastSeen structure */
+enum {
+	LASTSEEN_N_MSG = 5
+};
+
+/* We'll use a linked list for storing times and last utterances. O(n) is okay
+ * The latest message can always be found at msg[last_i] */
 typedef struct LastSeen LastSeen;
 struct LastSeen {
 	char name[IRC_NICK_LEN];
-	char msg[IRC_MSG_LEN];
+	char msg[LASTSEEN_N_MSG][IRC_MSG_LEN];
+	int last_i;
 	time_t seen;
 	LastSeen *next;
 };

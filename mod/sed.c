@@ -26,6 +26,7 @@ static Module mod = {
 	NULL
 };
 
+/* Returns exit status of sed, or -1 if i/o to it failed */
 static int
 substitute(char out[IRC_MSG_LEN], char *in, char *cmd)
 {
@@ -86,7 +87,7 @@ static void
 mod_function(char **args, enum irc_type type)
 {
 	char buf[IRC_MSG_LEN], msg[IRC_MSG_LEN];
-	int ret;
+	int i, msg_index;
 	LastSeen * ls;
 
 	(void) type;
@@ -97,13 +98,25 @@ mod_function(char **args, enum irc_type type)
 		irc_reply(args[0], "You have never said anything!", T_CHAN);
 		return;
 	}
-	ret = substitute(buf, ls->msg, args[1]);
-	if(!ret) {
+	for(i=0, msg_index = ls->last_i; i<LASTSEEN_N_MSG; i++, msg_index--) {
+		if(msg_index < 0)
+			msg_index = LASTSEEN_N_MSG-1;
+		if(!ls->msg[msg_index][0])
+			continue;
+		if(substitute(buf, ls->msg[msg_index], args[1]))
+			continue;
+		if(!strcmp(ls->msg[msg_index], buf))
+			continue;
 		snprintf(msg, IRC_MSG_LEN, "%s meant to say \"%s\"", args[0], buf);
 		irc_say(msg);
 		return;
 	}
-	irc_reply(args[0], buf, T_CHAN);
+	msg_index++;
+	/* buf is either the last string substituted or an error message */
+	if(!strcmp(ls->msg[msg_index], buf))
+		irc_reply(args[0], "You didn't correct anything you said recently.", T_CHAN);
+	else
+		irc_reply(args[0], buf, T_CHAN);
 }
 
 void

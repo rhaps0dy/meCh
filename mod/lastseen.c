@@ -13,7 +13,7 @@
 static void do_seen(char **args, enum irc_type type);
 static Module lastseen = {
 	"LastSeen",
-	"core module for \"Seen\" and \"On\"",
+	"core module for \"Seen\", \"On\" and \"Sed\".",
 	NULL,
 	do_seen,
 	2,
@@ -21,7 +21,7 @@ static Module lastseen = {
 	NULL
 };
 
-LastSeen base = {"", "", 0, NULL};
+LastSeen base = {"", {"", "", "", "", ""}, 0, 0, NULL};
 
 LastSeen *
 ls_find(char *name)
@@ -44,6 +44,7 @@ ls_new(char *name)
 	CHECK_MALLOC(l);
 	strcpy(l->name, name);
 	l->next = base.next;
+	l->last_i = LASTSEEN_N_MSG-1;
 	base.next = l;
 	return l;
 }
@@ -57,7 +58,8 @@ do_seen(char **args, enum irc_type type)
 
 	l = ls_find(args[0]);
 	if(!l) l = ls_new(args[0]);
-	strcpy(l->msg, args[1]);
+	l->last_i = (l->last_i+1) % LASTSEEN_N_MSG;
+	strcpy(l->msg[l->last_i], args[1]);
 	l->seen = time(NULL);
 }
 
