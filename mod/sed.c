@@ -21,7 +21,7 @@ static Module mod = {
 	"Use a sed(1) command to correct your previous sentence",
 	NULL,
 	mod_function,
-	2,
+	3,
 	T_CHAN,
 	NULL
 };
@@ -87,36 +87,62 @@ static void
 mod_function(char **args, enum irc_type type)
 {
 	char buf[IRC_MSG_LEN], msg[IRC_MSG_LEN];
-	int i, msg_index;
+	int i, msg_index, is_corr_to_other;
+	size_t len;
 	LastSeen * ls;
 
 	(void) type;
 
-	if(args[1][0] != 's' || args[1][1] != '/') return;
-	ls = ls_find(args[0]);
-	if(!ls) {
-		irc_reply(args[0], "You have never said anything!", T_CHAN);
+	len = strlen(args[1]);
+	if(args[1][0] == 's' && args[1][1] == '/') {
+		ls = ls_find(args[0]);
+		if(!ls) {
+			irc_reply(args[0], "You have never said anything!", T_CHAN);
+			return;
+		}
+		/* eliminate the separation between args[1] and args[2] */
+		if(args[1]+len != args[2] && *args[2])
+			args[1][len] = ' ';
+		is_corr_to_other = 0;
+	} else if(len > 0 && len-1 <= IRC_NICK_LEN && args[1][len-1] == ':') {
+		args[1][len-1] = '\0';
+		ls = ls_find(args[1]);
+		if(!ls) {
+			sprintf(msg, "%s has never said anything!", args[1]);
+			irc_reply(args[0], msg, T_CHAN);
+			return;
+		}
+		is_corr_to_other = 1;
+	} else
 		return;
-	}
 	for(i=0, msg_index = ls->last_i; i<LASTSEEN_N_MSG; i++, msg_index--) {
+		/* ls->msg is a circular buffer */
 		if(msg_index < 0)
 			msg_index = LASTSEEN_N_MSG-1;
 		if(!ls->msg[msg_index][0])
 			continue;
-		if(substitute(buf, ls->msg[msg_index], args[1]))
+		if(strbeg(ls->msg[msg_index], "s/"))
+			continue;
+		if(is_corr_to_other && substitute(buf, ls->msg[msg_index], args[2]))
+			continue;
+		else if(substitute(buf, ls->msg[msg_index], args[1]))
 			continue;
 		if(!strcmp(ls->msg[msg_index], buf))
 			continue;
-		snprintf(msg, IRC_MSG_LEN, "%s meant to say \"%s\"", args[0], buf);
-		irc_say(msg);
+		if(is_corr_to_other) {
+			snprintf(msg, IRC_MSG_LEN, "<%s> you mean \"%s\"", args[0], buf);
+			irc_reply(args[1], msg, T_CHAN);
+		} else {
+			snprintf(msg, IRC_MSG_LEN, "<%s> %s", args[0], buf);
+			irc_say(msg);
+		}
 		return;
 	}
 	msg_index++;
 	/* buf is either the last string substituted or an error message */
 	if(!strcmp(ls->msg[msg_index], buf))
-		irc_reply(args[0], "You didn't correct anything you said recently.", T_CHAN);
-	else
-		irc_reply(args[0], buf, T_CHAN);
+		sprintf(msg, "You didn't correct anything %s said recently.", (is_corr_to_other ? args[1] : "you"));
+	irc_reply(args[0], buf, T_CHAN);
 }
 
 void
