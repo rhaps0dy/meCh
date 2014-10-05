@@ -86,7 +86,7 @@ pipeerr:
 static void
 mod_function(char **args, enum irc_type type)
 {
-	char buf[IRC_MSG_LEN], msg[IRC_MSG_LEN];
+	char buf[IRC_MSG_LEN], msg[IRC_MSG_LEN], *sed_cmd;
 	int i, msg_index, is_corr_to_other;
 	size_t len;
 	LastSeen * ls;
@@ -100,18 +100,23 @@ mod_function(char **args, enum irc_type type)
 			irc_reply(args[0], "You have never said anything!", T_CHAN);
 			return;
 		}
-		/* eliminate the separation between args[1] and args[2] */
-		if(args[1]+len != args[2] && *args[2])
+		/* can't overflow: strlen(args[1]) + strlen(args[2]) < IRC_MSG_LEN */
+		if(*args[2])
 			args[1][len] = ' ';
+		sed_cmd = args[1];
 		is_corr_to_other = 0;
-	} else if(len > 0 && len-1 <= IRC_NICK_LEN && args[1][len-1] == ':') {
+	} else if(len > 0 && len-1 <= IRC_NICK_LEN && args[1][len-1] == ':' &&
+		args[2][0] == 's' && args[2][1] == '/') {
+
 		args[1][len-1] = '\0';
 		ls = ls_find(args[1]);
+		args[1][len-1] = ':';
 		if(!ls) {
 			sprintf(msg, "%s has never said anything!", args[1]);
 			irc_reply(args[0], msg, T_CHAN);
 			return;
 		}
+		sed_cmd = args[2];
 		is_corr_to_other = 1;
 	} else
 		return;
@@ -123,22 +128,20 @@ mod_function(char **args, enum irc_type type)
 			continue;
 		if(strbeg(ls->msg[msg_index], "s/"))
 			continue;
-		if(is_corr_to_other && substitute(buf, ls->msg[msg_index], args[2]))
-			continue;
-		else if(substitute(buf, ls->msg[msg_index], args[1]))
+		if(substitute(buf, ls->msg[msg_index], sed_cmd))
 			continue;
 		if(!strcmp(ls->msg[msg_index], buf))
 			continue;
 		if(is_corr_to_other) {
-			snprintf(msg, IRC_MSG_LEN, "<%s> you mean \"%s\"", args[0], buf);
+			snprintf(msg, IRC_MSG_LEN, "%s thinks you meant to say \"%s\"", args[0], buf);
 			irc_reply(args[1], msg, T_CHAN);
 		} else {
-			snprintf(msg, IRC_MSG_LEN, "<%s> %s", args[0], buf);
+			snprintf(msg, IRC_MSG_LEN, "%s meant to say \"%s\"", args[0], buf);
 			irc_say(msg);
 		}
 		return;
 	}
-	msg_index++;
+	msg_index++; /* correct for the last decrement */
 	/* buf is either the last string substituted or an error message */
 	if(!strcmp(ls->msg[msg_index], buf))
 		sprintf(msg, "You didn't correct anything %s said recently.", (is_corr_to_other ? args[1] : "you"));
