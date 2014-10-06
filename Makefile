@@ -5,7 +5,8 @@ LDFLAGS=
 LIBS=-lm
 
 MODDIR = mod
-_MODOBJ = utopia.o tell.o seen.o lastseen.o on.o fortune.o 1337.o autorejoin.o sed.o
+_MODOBJ = utopia.o tell.o seen.o lastseen.o on.o fortune.o 1337.o autorejoin.o \
+    sed.o ask.o
 MODOBJ = $(patsubst %,$(MODDIR)/%,$(_MODOBJ))
 
 DEPS = irc.h config.h module.h utils.h

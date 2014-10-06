@@ -148,4 +148,5 @@ mod_init(void)
 	mod_1337();
 	mod_autorejoin();
 	mod_sed();
+	mod_ask();
 }
