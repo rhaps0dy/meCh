@@ -132,13 +132,11 @@ mod_function(char **args, enum irc_type type)
 			continue;
 		if(!strcmp(ls->msg[msg_index], buf))
 			continue;
-		if(is_corr_to_other) {
-			snprintf(msg, IRC_MSG_LEN, "%s thinks you meant to say \"%s\"", args[0], buf);
-			irc_reply(args[1], msg, T_CHAN);
-		} else {
+		if(is_corr_to_other)
+			snprintf(msg, IRC_MSG_LEN, "%s %s thinks you meant to say \"%s\"", args[1], args[0], buf);
+		else
 			snprintf(msg, IRC_MSG_LEN, "%s meant to say \"%s\"", args[0], buf);
-			irc_say(msg);
-		}
+		irc_say(msg);
 		return;
 	}
 	msg_index++; /* correct for the last decrement */
