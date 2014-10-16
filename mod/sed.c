@@ -52,14 +52,19 @@ substitute(char out[IRC_MSG_LEN], char *in, char *cmd)
 		close(sedin[1]);
 		close(sedout[0]);
 		close(sederr[0]);
+		if(nslashes == 2) {
+			snprintf(out, IRC_MSG_LEN, "%s/", cmd);
+			cmd = out;
+		} else if(nslashes == 1) {
+			snprintf(out, IRC_MSG_LEN, "%s//", cmd);
+			cmd = out;
+		}
 		execlp("sed", "sed", "-e", cmd, NULL);
 	}
 	close(sedin[0]);
 	close(sedout[1]);
 	close(sederr[1]);
 	if(write(sedin[1], in, strlen(in)) == -1) goto ioerr;
-	for(i=nslashes; i<=3; i++)
-		write(sedin[1], "/", 1);
 	close(sedin[1]);
 	wait(&status);
 	if(status)
